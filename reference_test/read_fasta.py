@@ -2,7 +2,7 @@
 
 # ##############################################################################
 #
-# File: parse_fasta.py
+# File: read_fasta.py
 #
 # Authors:
 #
@@ -12,7 +12,7 @@
 #              reference genome dataset (GRCh38). It iterates through
 #              each sequence record, printing its ID and length.
 #
-# Usage: python parse_fasta.py
+# Usage: python read_fasta.py
 #
 # Dependencies:
 #   - BioPython: A library for computational biology.
