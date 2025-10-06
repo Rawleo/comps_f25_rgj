@@ -7,7 +7,7 @@ def writeBItVINT(num):
         chrByte = ((num & 0x7F) | 0x80)
         mask = 128
 
-        for i in range(7):
+        for i in range(8):
 
             if (chrByte & mask):
                 bits += '1'
@@ -17,11 +17,11 @@ def writeBItVINT(num):
             mask = mask >> 1
 
         num = num >> 7
-    
-    chrByte = (num & 0x7F)
+
+    chrByte = num
     mask = 128
 
-    for i in range(7):
+    for i in range(8):
 
         if (chrByte & mask):
             bits += '1'
@@ -34,8 +34,6 @@ def writeBItVINT(num):
 
 def main():
 
-    print(writeBItVINT(111))
-    print(writeBItVINT(655))
-    print(writeBItVINT(3))
+ print(writeBItVINT(300))
 
 main()
