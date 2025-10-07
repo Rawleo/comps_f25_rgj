@@ -1,6 +1,6 @@
 # VCF to Custom Format Conversion
 
-This document outlines the steps to convert a high-confidence VCF file from the [Genome in a Bottle (GIAB) project](https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/release/AshkenazimTrio/HG002_NA24385_son/NISTv4.2.1/) into a custom, sorted, comma-separated format.
+This document outlines the steps to convert a high-confidence VCF file from the [Genome in a Bottle (GIAB) project](https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/release/AshkenazimTrio/) into a custom, sorted, comma-separated format.
 
 The script classifies variants as SNPs (`0`), deletions (`1`), or insertions (`2`), applies special formatting for indels, and sorts the final output.
 
@@ -16,7 +16,7 @@ Before you begin, ensure you have the following software installed:
 
 You'll need a high-confidence VCF file from the GIAB project. For this guide, we'll assume you're using the recommended file for most modern applications:
 
-* **File**: `HG002_GRCh38_1_22_v4.2.1_benchmark.vcf.gz`
+* **File**: [`HG002_GRCh38_1_22_v4.2.1_benchmark.vcf.gz`](https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/release/AshkenazimTrio/HG002_NA24385_son/NISTv4.2.1/GRCh38/)
 
 ## Instructions
 
