@@ -14,7 +14,7 @@ Before you begin, ensure you have the following software installed:
 
 ## Input Data
 
-You'll need a high-confidence VCF file from the GIAB project. For this guide, we'll assume you're using the recommended file for most modern applications:
+You'll need a high-confidence VCF file from the GIAB project.
 
 * **Son**: [`HG002_GRCh38_1_22_v4.2.1_benchmark.vcf.gz`](https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/release/AshkenazimTrio/HG002_NA24385_son/NISTv4.2.1/GRCh38/)
 
@@ -26,21 +26,16 @@ You'll need a high-confidence VCF file from the GIAB project. For this guide, we
 
 Follow these steps to generate the formatted file.
 
-### 1. Find the Conversion Script
-
-Locate the file named `convert_vcf.sh`.
-
-### 2. Make the Script Executable
-
-In your terminal, give the script permission to run with the following command:
-
-`chmod +x convert_vcf.sh`
-
-### 3. Run the Script
-
-Execute the script from your terminal:
-
-`./convert_vcf.sh`
+1.  **Save** the script as `process_variants.sh`.
+2.  **Make it executable**: `chmod +x process_variants.sh`
+3.  **Run it** from your terminal, providing the input VCF and desired output filename as arguments:
+    ```
+    ./process_variant.sh /path/to/your/input.vcf.gz /path/to/your/output.txt
+    ```
+    For example:
+    ```
+    ./process_variant.sh HG002_GRCh38_1_22_v4.2.1_benchmark.vcf.gz HG002_GRCh38_sorted_variants.txt
+    ```
 
 The script will process the VCF file and create a new sorted txt file in the same directory.
 

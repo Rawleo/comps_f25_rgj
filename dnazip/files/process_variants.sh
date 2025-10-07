@@ -1,16 +1,43 @@
 #!/bin/bash
 
-# --- Configuration ---
-# Set the input and output filenames here.
-# Please update INPUT_VCF to the correct path for your system.
-# bcftools should also be added to your $PATH variable.
+# --- Usage function ---
+# This function displays instructions on how to run the script.
+usage() {
+    echo "Usage: $0 <input.vcf.gz> <output.txt>"
+    echo "Processes a VCF file into a sorted, comma-separated format with variant flags."
+    echo "  <input.vcf.gz>: Path to the input VCF file (can be gzipped)."
+    echo "  <output.txt>: Path for the resulting text file."
+    exit 1
+}
 
-INPUT_VCF="HG002_GRCh38_1_22_v4.2.1_benchmark.vcf.gz"
-OUTPUT="HG002_GRCh38_sorted_variants.txt"
+# --- Argument Parsing ---
+# Check if exactly two arguments (input and output file) are provided.
+if [ "$#" -ne 2 ]; then
+    echo "Error: Incorrect number of arguments provided."
+    usage
+fi
+
+INPUT_VCF="$1"
+OUTPUT="$2"
+
+# --- Pre-run Checks ---
+# Check if bcftools is installed and available in the system's PATH.
+if ! command -v bcftools &> /dev/null
+then
+    echo "Error: 'bcftools' could not be found."
+    echo "Please install bcftools and ensure it is in your system's PATH to continue."
+    exit 1
+fi
+
+# Check if the input VCF file exists before proceeding.
+if [ ! -f "$INPUT_VCF" ]; then
+    echo "Error: Input file '$INPUT_VCF' not found."
+    echo "Please provide a valid path to your VCF file."
+    exit 1
+fi
 
 # --- Main Pipeline ---
 # This command chain converts the VCF to the desired format and sorts it.
-# It is designed to be run from the command line.
 
 echo "Starting VCF conversion for: $INPUT_VCF"
 
