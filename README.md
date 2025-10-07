@@ -1,2 +1,2 @@
-# comps_f25_rgj
-Carleton College Compression Algorithm Comps F'25
+# The GeneZippers
+Carleton College Data Compression Algorithm Comps F'25
