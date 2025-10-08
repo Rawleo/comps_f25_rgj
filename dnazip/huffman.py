@@ -14,11 +14,10 @@ VARIATION_FLAG = {
     'deletions': 1,
     'insertions': 2,
 }
+
 '''
 Node Class for implementing a binary tree.
 '''
-
-
 class Node:
 
     def __init__(self, symbol, frequency, leftChild=None, rightChild=None):
@@ -35,8 +34,6 @@ Read in an input file.
 @return:
  * text - the contents of the file as a string
 '''
-
-
 def read_in_file(input_file):
     file_in = open(input_file, "r")
     text = (file_in.read())
@@ -98,8 +95,6 @@ Build the required dictionary, mapping each symbol to their frequency.
 @return:
  * freq_dict - a dictionary containing the unique symbol with their corresponding frequency.
 '''
-
-
 def build_frequency_dict(input_text):
     freq_dict = {}
     for char in input_text:
@@ -117,8 +112,6 @@ Build the huffman tree according to their frequencies.
 @return:
  * nodes - the binary Huffman Tree beginning at the root.
 '''
-
-
 def build_huffman_tree(freq_dict):
     nodes = []
     for symbol, freq in freq_dict.items():
@@ -144,8 +137,6 @@ Assign correct binary tree mapping to each unique symbol using recursion.
 @return:
  * encoding_map - a dictionary for each unique symbol corresponding to their unique encoding
 '''
-
-
 def map_encodings(root, encoding_map, current):
     if root is None:
         return
@@ -165,8 +156,6 @@ Encode the string according to its mapping.
 @return:
  * encoded_text - output text after it has been encoded by dict
 '''
-
-
 def encode_text(encoding_map, text):
     encoded_text = ""
     for char in text:
@@ -182,8 +171,6 @@ Decode the encoded string to retrieve the original string.
 @return:
  * result - the original text after it has been decoded.
 '''
-
-
 def decode(encoded_text, root):
     result = ""
     curr = root
@@ -205,8 +192,6 @@ Read in binary file from bytes to bits to string. For some reason it adds a lead
 @return:
  * bits - the original huffman encoded bits
 '''
-
-
 def read_bin(filename):
     with open(filename + '.bin', 'rb') as file:
         data = file.read()
@@ -232,8 +217,6 @@ in big-endian order.
 @return:
  * Exports a .bin file of the encoded string now as bytes to the current directory
 '''
-
-
 def export_as_binary(export_name, binary_str):
     byte_value = int(binary_str, 2).to_bytes((len(binary_str) + 7) // 8,
                                              byteorder='big')
@@ -250,8 +233,6 @@ Export input text as txt file.
 @return:
  * Exports a text file to the current directory.
 '''
-
-
 def export_as_txt(export_name, text):
     with open(export_name + ".txt", "w") as file:
         file.write(str(text))
@@ -260,53 +241,11 @@ def export_as_txt(export_name, text):
 '''
 Run the program.
 '''
-
-
 def main():
 
     text = read_in_file("files/HG002_GRCh38_sorted_variants.txt")
     k_mer_array = create_k_mer_array(text, 4)
     process_k_mers(k_mer_array)
-    
-    
-    
-    
-    
-    """
-    file_list = ["DNA", "Emma", "random", "sample_text"]
-    for file_name in file_list:
-        
-        export_name = "export_files/" + file_name
-
-        encoding_map    = {}
-        text            = read_in_file("input_files/" + file_name + ".txt")
-        freq_dict       = build_frequency_dict(text)
-        root            = build_huffman_tree(freq_dict)
-        
-        map_encodings(root, encoding_map, "")
-        
-        encoded_text = encode_text(encoding_map, text)
-        
-        export_as_binary(export_name, encoded_text)
-        export_as_txt(export_name + "_encoded", encoded_text)
-        export_as_txt(export_name + "_encoding_map", encoding_map)
-        
-        bin_file            = read_bin(export_name)
-        result              = decode(encoded_text, root)
-        result_from_bytes   = decode(bin_file, root)
-        
-        export_as_txt(export_name + "_decoded", result)
-        export_as_txt(export_name + "_decoded_bin", result_from_bytes)
-
-    
-    # print("\n")
-    # print("Default encoding: " + encoded_text)
-    # print("\n")
-    # print("Encoding from .bin file: " + bin_file)
-    # print("Decoded from .bin file: " + result_from_bytes)
-    # print("\n")
-    
-    """
 
 
 if __name__ == "__main__":
