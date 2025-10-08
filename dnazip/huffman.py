@@ -247,13 +247,13 @@ Run the program.
 '''
 def main():
     encoding_map = {}
-    text = read_in_file("files/HG002_GRCh38_sorted_variants.txt")
-    k_mer_array = create_k_mer_array(text, 4)
+    text = read_in_file("files/HG002_GRCh38_sorted_variants.txt") # In our paper, cite or create an appendix that discusses how we got to this. 
+    k_mer_array = create_k_mer_array(text, 4) # Cite insertion k-mer in DNAZip.
     # print(k_mer_array)
-    freq_dict = build_frequency_dict(k_mer_array)
+    freq_dict = build_frequency_dict(k_mer_array) # Cite huffman paper, by Huffman himself. 
     # print(freq_dict)
     root = build_huffman_tree(freq_dict)
-    map_encodings(root, encoding_map, "")
+    map_encodings(root, encoding_map, "") # frequency table 4-mer, cite DNAZip paper and huffman table (paper). 
     print(encoding_map)
 
 if __name__ == "__main__":
