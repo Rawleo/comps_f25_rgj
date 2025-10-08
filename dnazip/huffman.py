@@ -53,7 +53,8 @@ def read_each_line(input_text):
     
     return None
 
-def process_k_mers(processed_insertion_array)
+def process_k_mers(processed_insertion_array): 
+    return None
 
 '''
 Build the required dictionary, mapping each symbol to their frequency.
