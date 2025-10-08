@@ -2,10 +2,10 @@
 #
 # ==============================================================================
 #
-# bio_pipeline.sh (Organized Directories & Integrated Docs Version)
+# dnazip_pipeline.sh (Organized Directories & Integrated )
 #
 # Description:
-#   A unified script to perform common bioinformatics data preparation tasks.
+#   A unified script to perform bioinformatics data preparation tasks.
 #   It organizes output into directories and includes a full user guide.
 #
 # ==============================================================================
