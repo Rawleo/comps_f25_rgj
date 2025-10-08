@@ -7,7 +7,7 @@ The script iterates through a predefined list of human chromosomes, running the 
 ## Prerequisites
 
 1.  **`bigBedToBed` Utility**: You must have the [UCSC Kent command-line utilities](http://hgdownload.soe.ucsc.edu/admin/exe/) installed. The `bigBedToBed` executable needs to be in your system's PATH.
-2.  **Input File**: The source `bigBed` file (`dbSnp155Common.bb` by default) must be located in the same directory where the script is run.
+2.  **Input File**: The source `bigBed` file (`dbSnp155Common.bb` by default), [UCSC downloads page](https://hgdownload.soe.ucsc.edu/gbdb/hg38/snp/) must be located in the same directory where the script is run. If it is not, the bash script will automatically download it.
 
 ## How to Use
 

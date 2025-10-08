@@ -245,6 +245,7 @@ def main():
 
     text = read_in_file("files/HG002_GRCh38_sorted_variants.txt")
     k_mer_array = create_k_mer_array(text, 4)
+    print(k_mer_array)
     process_k_mers(k_mer_array)
 
 

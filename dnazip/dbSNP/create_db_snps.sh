@@ -2,11 +2,11 @@
 
 # --- Configuration ---
 # The name of the input bigBed file.
-# Make sure this file is in the same directory as the script, or provide a full path.
 BIGBED_FILE="dbSnp155Common.bb"
+# The URL to download the file from if it's missing.
+BIGBED_URL="https://hgdownload.soe.ucsc.edu/gbdb/hg38/snp/dbSnp155Common.bb"
 
 # A list of chromosomes to process.
-# We'll use the standard set for hg38.
 CHROMOSOMES=(
     "chr1" "chr2" "chr3" "chr4" "chr5" "chr6" "chr7" "chr8" "chr9" "chr10"
     "chr11" "chr12" "chr13" "chr14" "chr15" "chr16" "chr17" "chr18" "chr19"
@@ -15,7 +15,7 @@ CHROMOSOMES=(
 
 # --- Script Logic ---
 
-# 1. Check if the bigBedToBed utility is installed and available in the PATH.
+# 1. Check if required utilities are installed.
 if ! command -v bigBedToBed &> /dev/null
 then
     echo "Error: The 'bigBedToBed' utility could not be found."
@@ -23,11 +23,27 @@ then
     exit 1
 fi
 
-# 2. Check if the input bigBed file exists.
+# 2. Check if the input bigBed file exists and download it if not.
 if [ ! -f "$BIGBED_FILE" ]; then
-    echo "Error: Input file '$BIGBED_FILE' not found."
-    echo "Please place the file in the same directory as this script or update the BIGBED_FILE variable."
-    exit 1
+    echo "Input file '$BIGBED_FILE' not found. Attempting to download..."
+
+    # Check for wget before attempting to download
+    if ! command -v wget &> /dev/null
+    then
+        echo "Error: 'wget' is not installed. Please install wget or download the file manually from:"
+        echo "$BIGBED_URL"
+        exit 1
+    fi
+
+    # Download the file using the URL
+    wget "$BIGBED_URL"
+
+    # Verify that the download was successful
+    if [ $? -ne 0 ]; then
+        echo "Error: Download failed. Please check the URL or your network connection."
+        exit 1
+    fi
+    echo "Download complete."
 fi
 
 echo "Starting batch conversion of '$BIGBED_FILE'..."
@@ -41,7 +57,7 @@ do
     # Run the bigBedToBed command for the current chromosome.
     bigBedToBed "$BIGBED_FILE" -chrom="$CHR" "$OUTPUT_FILE"
 
-    # Optional: Check if the command was successful before continuing.
+    # Optional: Check if the command was successful.
     if [ $? -ne 0 ]; then
         echo "Warning: Command failed for ${CHR}."
     fi
