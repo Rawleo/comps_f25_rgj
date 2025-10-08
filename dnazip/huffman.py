@@ -7,9 +7,18 @@
             encoding dictionary.
 '''
 
+import re
+
+VARIATION_FLAG = {
+    'snps': 0,
+    'deletions': 1,
+    'insertions': 2,
+}
 '''
 Node Class for implementing a binary tree.
 '''
+
+
 class Node:
 
     def __init__(self, symbol, frequency, leftChild=None, rightChild=None):
@@ -26,55 +35,61 @@ Read in an input file.
 @return:
  * text - the contents of the file as a string
 '''
+
+
 def read_in_file(input_file):
     file_in = open(input_file, "r")
     text = (file_in.read())
     return text
 
 
-def create_insertion_array(input_text):
-    
-    count = 0
+'''
+Create a list of k-mers from insertion sequences.
+@params: 
+ * input_text - a string containing comma-separated variation data, one variation per line
+ * k_mer_length - the integer length of the k-mer to be extracted from nucleotide sequences
+@return:
+ * processed_k_mer_array - a list of k-mer strings extracted from all insertion sequences
+'''
+def create_k_mer_array(input_text, k_mer_length):
+
+    # FORMAT OF INPUT TEXT:
+    # var_flag, chromosome, absolute_position, nucleotides
+
+    k = k_mer_length
+    regex_k = k * '.'
     text_array = input_text.splitlines()
-    processed_insertion_array = []
-    
-    for line in text_array: 
-        
+    processed_k_mer_array = []
+
+    for line in text_array:
+
         line_array = line.split(",")
-        variation_flag = line_array[0]
-        chr_num = line_array[1]
-        absolute_pos = line_array[2]
+        var_flag = line_array[0]
         nucleotide_seq = line_array[3].split("/")[1]
-        
-        # variation flag 2 is for insertions
-        
-        if (variation_flag == '2'): 
-            if(len(nucleotide_seq) >= 4): 
-                
-                
-                # split the string by fours and disregard the remainder
-                # append the 4-mers into the insertion array
-                
-                
-                processed_insertion_array.append(nucleotide_seq)
-                count +=1
-        """
-        if (count > 1000000): 
-            # for item in processed_insertion_array:
-            #     print(item)
-            break # currently limiting the max output
-        
-        """
-    
-    # print(processed_insertion_array)
-    print(len(processed_insertion_array))
 
-    return processed_insertion_array
+        # chr_num = line_array[1]
+        # absolute_pos = line_array[2]
 
-def process_k_mers(processed_insertion_array): 
-    
-    
+        if (int(var_flag) == VARIATION_FLAG['insertions']):
+            if (len(nucleotide_seq) >= k):
+
+                # Split the string by fours, discard excess
+                # Append the 4-mers into the insertion array
+
+                k_mer_array = re.findall(regex_k, nucleotide_seq)
+
+                for k_mer in k_mer_array:
+                    processed_k_mer_array.append(k_mer)
+
+    print("Number of k-mers:", len(processed_k_mer_array))
+
+    return processed_k_mer_array
+
+
+def process_k_mers(processed_k_mer_array):
+
     return None
+
 
 '''
 Build the required dictionary, mapping each symbol to their frequency.
@@ -83,6 +98,8 @@ Build the required dictionary, mapping each symbol to their frequency.
 @return:
  * freq_dict - a dictionary containing the unique symbol with their corresponding frequency.
 '''
+
+
 def build_frequency_dict(input_text):
     freq_dict = {}
     for char in input_text:
@@ -100,6 +117,8 @@ Build the huffman tree according to their frequencies.
 @return:
  * nodes - the binary Huffman Tree beginning at the root.
 '''
+
+
 def build_huffman_tree(freq_dict):
     nodes = []
     for symbol, freq in freq_dict.items():
@@ -125,6 +144,8 @@ Assign correct binary tree mapping to each unique symbol using recursion.
 @return:
  * encoding_map - a dictionary for each unique symbol corresponding to their unique encoding
 '''
+
+
 def map_encodings(root, encoding_map, current):
     if root is None:
         return
@@ -144,6 +165,8 @@ Encode the string according to its mapping.
 @return:
  * encoded_text - output text after it has been encoded by dict
 '''
+
+
 def encode_text(encoding_map, text):
     encoded_text = ""
     for char in text:
@@ -159,6 +182,8 @@ Decode the encoded string to retrieve the original string.
 @return:
  * result - the original text after it has been decoded.
 '''
+
+
 def decode(encoded_text, root):
     result = ""
     curr = root
@@ -180,6 +205,8 @@ Read in binary file from bytes to bits to string. For some reason it adds a lead
 @return:
  * bits - the original huffman encoded bits
 '''
+
+
 def read_bin(filename):
     with open(filename + '.bin', 'rb') as file:
         data = file.read()
@@ -205,14 +232,16 @@ in big-endian order.
 @return:
  * Exports a .bin file of the encoded string now as bytes to the current directory
 '''
+
+
 def export_as_binary(export_name, binary_str):
     byte_value = int(binary_str, 2).to_bytes((len(binary_str) + 7) // 8,
                                              byteorder='big')
     # print(byte_value)
     with open(export_name + ".bin", "wb") as file:
         file.write(byte_value)
-        
-        
+
+
 '''
 Export input text as txt file.
 @params: 
@@ -221,6 +250,8 @@ Export input text as txt file.
 @return:
  * Exports a text file to the current directory.
 '''
+
+
 def export_as_txt(export_name, text):
     with open(export_name + ".txt", "w") as file:
         file.write(str(text))
@@ -229,19 +260,13 @@ def export_as_txt(export_name, text):
 '''
 Run the program.
 '''
+
+
 def main():
-    
-    
+
     text = read_in_file("files/HG002_GRCh38_sorted_variants.txt")
-    insertion_array = create_insertion_array(text)
-    process_k_mers(insertion_array)
-    
-    
-    
-    
-    
-    
-    
+    k_mer_array = create_k_mer_array(text, 4)
+    process_k_mers(k_mer_array)
     
     
     
