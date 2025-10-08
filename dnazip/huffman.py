@@ -35,8 +35,8 @@ Read in an input file.
  * text - the contents of the file as a string
 '''
 def read_in_file(input_file):
-    file_in = open(input_file, "r")
-    text = (file_in.read())
+    with open(input_file, "r") as file_in:
+        text = (file_in.read())
     return text
 
 
@@ -60,9 +60,10 @@ def create_k_mer_array(input_text, k_mer_length):
 
     for line in text_array:
 
-        line_array = line.split(",")
-        var_flag = line_array[0]
-        nucleotide_seq = line_array[3].split("/")[1]
+        # line_array = line.split(",")
+        var_flag, chromosome, absolute_position, nucleotide_seq = line.split(",")
+        # var_flag = line_array[0]
+        nucleotide_seq = nucleotide_seq.split("/")[1]
 
         # chr_num = line_array[1]
         # absolute_pos = line_array[2]
@@ -78,12 +79,15 @@ def create_k_mer_array(input_text, k_mer_length):
                 for k_mer in k_mer_array:
                     processed_k_mer_array.append(k_mer)
 
-    print("Number of k-mers:", len(processed_k_mer_array))
+    # print("Number of k-mers:", len(processed_k_mer_array))
 
     return processed_k_mer_array
 
 
 def process_k_mers(processed_k_mer_array):
+    # freq_dict = {}
+    # for k_mer in processed_k_mer_array:
+        
 
     return None
 
@@ -242,12 +246,15 @@ def export_as_txt(export_name, text):
 Run the program.
 '''
 def main():
-
+    encoding_map = {}
     text = read_in_file("files/HG002_GRCh38_sorted_variants.txt")
     k_mer_array = create_k_mer_array(text, 4)
-    print(k_mer_array)
-    process_k_mers(k_mer_array)
-
+    # print(k_mer_array)
+    freq_dict = build_frequency_dict(k_mer_array)
+    # print(freq_dict)
+    root = build_huffman_tree(freq_dict)
+    map_encodings(root, encoding_map, "")
+    print(encoding_map)
 
 if __name__ == "__main__":
     main()
