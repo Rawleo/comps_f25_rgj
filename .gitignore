@@ -4,15 +4,15 @@
 # Ignore downloaded and generated files from the dnazip_pipeline.sh script
 # Ignore the directory containing downloaded chromosome FASTA files.
 # This prevents large, reproducible data from being committed to version control.
-chr/chr*
+dnazip/chr/chr*
 
 # Ignore the directory containing downloaded and processed dbSNP data.
-dbSNP/chr*
-dbSNP/db*
+dnazip/dbSNP/chr*
+dnazip/dbSNP/*.bb
 
 # Note: The 'files/' directory is intended for both input and output.
 # You should add your input VCF file (e.g., 'files/input.vcf.gz') to version control,
 # but you might want to ignore specific output files.
 # Example: Ignore all .txt files in the 'files' directory
-files/*.txt
-files/*.vcf
+dnazip/files/*.txt
+dnazip/files/*.vcf
