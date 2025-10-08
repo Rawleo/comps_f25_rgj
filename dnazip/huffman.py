@@ -32,7 +32,7 @@ def read_in_file(input_file):
     return text
 
 
-def read_each_line(input_text):
+def create_insertion_array(input_text):
     
     count = 0
     text_array = input_text.splitlines()
@@ -48,12 +48,32 @@ def read_each_line(input_text):
         
         # variation flag 2 is for insertions
         
-        if (variation_flag == '2'): count +=1; print(nucleotide_seq); if(len(nucleotide_seq) < 4): processed_insertion_array.append(nucleotide_seq)
-        if (count == 1000): print(processed_insertion_array); break # currently limiting the max output
+        if (variation_flag == '2'): 
+            if(len(nucleotide_seq) >= 4): 
+                
+                
+                # split the string by fours and disregard the remainder
+                # append the 4-mers into the insertion array
+                
+                
+                processed_insertion_array.append(nucleotide_seq)
+                count +=1
+        """
+        if (count > 1000000): 
+            # for item in processed_insertion_array:
+            #     print(item)
+            break # currently limiting the max output
+        
+        """
     
-    return None
+    # print(processed_insertion_array)
+    print(len(processed_insertion_array))
+
+    return processed_insertion_array
 
 def process_k_mers(processed_insertion_array): 
+    
+    
     return None
 
 '''
@@ -213,7 +233,8 @@ def main():
     
     
     text = read_in_file("files/HG002_GRCh38_sorted_variants.txt")
-    read_each_line(text)
+    insertion_array = create_insertion_array(text)
+    process_k_mers(insertion_array)
     
     
     
