@@ -4,6 +4,7 @@ def writeBitVINT(num):
 
     while (num >= 128):
 
+        # Get last 7 bits and set first bit to 1
         chrByte = ((num & 0x7F) | 0x80)
         mask = 128
 
@@ -16,6 +17,7 @@ def writeBitVINT(num):
 
             mask = mask >> 1
 
+        # num by 7 bits
         num = num >> 7
 
     chrByte = num
@@ -44,17 +46,25 @@ def BytesToBitString(bytes_obj):
 def readBitVINT(bytes_obj):
 
     bit_string = BytesToBitString(bytes_obj)
-    position = 0
-
-    while bit_string[0] == "1":
-
-        #figure out some math
-
-        bit_string = bit_string[7:]
-
-    # do something for the last 8 bits
     
-    return position
+    num = 0
+    shift = 0
+
+    for i in range(0, len(bit_string), 8):
+
+        byte = bit_string[i:i+8]
+        bits = byte[1:]
+        bit_val = int(bits, 2)
+
+        num |= (bit_val << shift)
+
+        shift += 7
+
+        if byte[0] == '0':
+            break
+
+    return num
+
 
 def main():
 
@@ -69,5 +79,6 @@ def main():
     print(f'Binary Back to String: {byte_decode}')
 
     readBitVINT(byte_obj)
+
 
 main()
