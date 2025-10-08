@@ -16,3 +16,4 @@ dnazip/dbSNP/*.bb
 # Example: Ignore all .txt files in the 'files' directory
 dnazip/files/*.txt
 dnazip/files/*.vcf
+dnazip/files/*.gz
