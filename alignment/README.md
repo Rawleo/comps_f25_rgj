@@ -133,7 +133,7 @@ Here’s what the script does step by step:
 
 ---
 
-## 📤 Output
+## Output
 
 Your final result will be a VCF-like file:
 
