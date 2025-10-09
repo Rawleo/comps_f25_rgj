@@ -84,7 +84,7 @@ files for the GIAB Ashkenazim Trio (Son HG002, Father HG003, Mother HG004).
 To run the entire automated pipeline, use the `--process-giab-trio` command:
 
    Example:
-   ./bio_pipeline.sh --process-giab-trio
+   ./dnazip_pipeline.sh --process-giab-trio
 
 The script will perform the following steps for each of the three samples:
 1.  Check if the VCF file exists in the 'files/' directory.
@@ -105,7 +105,7 @@ If you wish to process a different VCF file, you can still use the manual
 2.  Run the script providing the input and desired output filenames.
 
     Example:
-    ./bio_pipeline.sh --process-vcf my_variants.vcf.gz my_processed_variants.txt
+    ./dnazip_pipeline.sh --process-vcf my_variants.vcf.gz my_processed_variants.txt
 
 --------------------------------------------------------------------------------
 Output Format Explained
