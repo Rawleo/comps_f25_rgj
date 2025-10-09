@@ -19,3 +19,4 @@ dnazip/files/*.vcf
 dnazip/files/*.gz
 
 alignment/files/*
+alignment/all2vcf*
