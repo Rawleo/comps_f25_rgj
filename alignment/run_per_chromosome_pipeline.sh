@@ -1,5 +1,10 @@
 #!/bin/bash
 
+
+### ISSUE WITH NAMING OF THE CHROMOSOMES, NEED TO FIX, BUT OTHERWISE THIS MAY NOT BE NEEDED.
+
+
+
 # This script automates per-chromosome genome alignment using MUMmer4
 # and converts the output to a pseudo-VCF file.
 # It splits multi-FASTA genome files into individual chromosome files,
