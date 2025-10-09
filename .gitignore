@@ -20,3 +20,8 @@ dnazip/files/*.gz
 
 alignment/files/*
 alignment/all2vcf*
+
+alignment/*
+!alignment/*.sh
+!alignment/requirements.txt
+!alignment/*.md
