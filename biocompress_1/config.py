@@ -1,0 +1,3 @@
+DNA_FILE = "DNA_test"
+DNA_FILE_TXT = DNA_FILE + ".txt"
+HEIGHT = 3

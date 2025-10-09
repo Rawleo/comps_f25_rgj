@@ -16,6 +16,17 @@ def encodeFibonacci(num):
 
     return binaryCode
 
+
+def baseToBinary(base: str):
+    mapping = {
+            "A": "11",
+            "C": "10",
+            "T": "01",
+            "G": "00",
+        }
+    return mapping.get(base, "11")
+
+
 def main():
     print(encodeFibonacci(19))
 
