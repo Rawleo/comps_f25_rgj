@@ -94,7 +94,7 @@ def createTree(height: int) -> Node:
 def findFactor(string: str, tree: Node):
     print("String:", string)
     curr = tree
-    last_pos: Optional[int] = None
+    last_pos: Optional[list[int]] = None
     last_level: Optional[int] = None
 
     steps = min(HEIGHT, len(string))
@@ -113,7 +113,7 @@ def findFactor(string: str, tree: Node):
         curr = next_curr
 
         if curr.positions:
-            last_pos = curr.positions[0]
+            last_pos = curr.positions
             last_level = curr.level
         else:
             if (last_pos is not None and last_level is not None):
