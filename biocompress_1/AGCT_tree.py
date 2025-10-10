@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from typing import Optional
-from config import HEIGHT
+from config import HEIGHT, CONTENT
 
 
 @dataclass
@@ -93,24 +93,36 @@ def createTree(height: int) -> Node:
 
 def findFactor(string: str, tree: Node):
     print("String:", string)
-    position = -1
-    mapping = {
-            "A": tree.aBranch,
-            "C": tree.cBranch,
-            "T": tree.tBranch,
-            "G": tree.gBranch,
+    curr = tree
+    last_pos: Optional[int] = None
+    last_level: Optional[int] = None
+
+    steps = min(HEIGHT, len(string))
+    for i in range(steps):
+        mapping = {
+            "A": curr.aBranch,
+            "C": curr.cBranch,
+            "T": curr.tBranch,
+            "G": curr.gBranch,
         }
-    for i in range(HEIGHT):
-        if(tree.positions):
-            position = tree.positions[0]
-        next_tree = mapping.get(string[i])
-        if next_tree is None:
-            return None 
-        tree = next_tree 
-        if(not tree.positions):
-            return {position, tree.level-1}
-    print("FOUND STRING")
-    return(tree.positions[0], tree.level)
+
+        next_curr = mapping.get(string[i])
+        if next_curr is None:
+            return (None, None) 
+
+        curr = next_curr
+
+        if curr.positions:
+            last_pos = curr.positions[0]
+            last_level = curr.level
+        else:
+            if (last_pos is not None and last_level is not None):
+                return (last_pos, last_level)
+            return (None, None) 
+
+    if (last_pos is not None and last_level is not None):
+        return (last_pos, last_level)
+    return (None, None)
 
 
 def main():
