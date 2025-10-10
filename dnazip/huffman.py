@@ -7,7 +7,7 @@
             encoding dictionary.
 '''
 
-import re
+import re, sys, argparse, os
 
 VARIATION_FLAG = {
     'snps': 0,
@@ -242,12 +242,37 @@ def export_as_txt(export_name, text):
         file.write(str(text))
 
 
+def initialize_parser():
+    parser = argparse.ArgumentParser(
+        prog="huffman",
+        description="Create Huffman encoding based on file input."
+    )
+    
+    parser.add_argument(
+        'filename',
+        type=str,
+        help="Input filename."
+    )
+    
+    args = parser.parse_args()
+    
+    try:
+        with open(args.filename, "r") as file_in:
+            pass
+    except Exception as e:
+        print("Please choose a valid file in the files directory.")
+    
+    return args
+
+
 '''
 Run the program.
 '''
 def main():
+    args = initialize_parser()
+    
     encoding_map = {}
-    text = read_in_file("files/HG002_GRCh38_sorted_variants.txt") # In our paper, cite or create an appendix that discusses how we got to this. 
+    text = read_in_file(f"files/{args.filename}") # In our paper, cite or create an appendix that discusses how we got to this. 
     k_mer_array = create_k_mer_array(text, 4) # Cite insertion k-mer in DNAZip.
     # print(k_mer_array)
     freq_dict = build_frequency_dict(k_mer_array) # Cite huffman paper, by Huffman himself. 
