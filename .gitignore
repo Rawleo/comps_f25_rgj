@@ -1,5 +1,6 @@
 # macOS DS_Store
 .DS_Store
+./venv
 
 # Ignore downloaded and generated files from the dnazip_pipeline.sh script
 # Ignore the directory containing downloaded chromosome FASTA files.
