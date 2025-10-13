@@ -1,0 +1,7 @@
+ToDo:
+binary or fibonacci
+factor or literal
+window
+
+note:
+encoding - factor=0

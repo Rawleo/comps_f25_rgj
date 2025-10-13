@@ -1,6 +1,6 @@
 from AGCT_tree import createTree, findFactor
 from config import HEIGHT, DNA_FILE, CONTENT
-from converter import baseToBinary
+from converter import baseToBinary, encodeFactor
 from typing import Optional
 
 
@@ -99,7 +99,8 @@ def printBuf(buffer):
             outputFile.write(str(i[0]))
             outputFile.write(str(i[1]))
             outputFile.write(str(i[2]))
-    outputFile.write(" ")
+            outputFile.write(encodeFactor(i))
+        outputFile.write(" ")
             
     
 def encode(processed, buffer):

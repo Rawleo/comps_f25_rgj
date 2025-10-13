@@ -1,1 +1,1 @@
-4ACGT 2[0]4palindrome[3]1factor 
+4A C G T 2[0]4palindrome1011P01 [3]1factor11F0011 

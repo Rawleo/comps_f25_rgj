@@ -4,6 +4,7 @@ def encodeFibonacci(num):
         fibNumbers.append(fibNumbers[len(fibNumbers)-1]+fibNumbers[len(fibNumbers)-2])
     del fibNumbers[len(fibNumbers)-1]
 
+    
     code = []
     for val in reversed(fibNumbers):
         if(num>=val):
@@ -26,9 +27,23 @@ def baseToBinary(base: str):
         }
     return mapping.get(base, "11")
 
+def encodeFactor(factor):
+    length = factor[1]
+    type = factor[2]
+    position = factor[0][0]
+    if(type=="factor"):
+        type="0"
+    else:
+        type="1"
+    length=encodeFibonacci(length)
+    position=encodeFibonacci(position)
+
+    return length+type+position
+
+
 
 def main():
-    print(encodeFibonacci(19))
+    print(encodeFibonacci(3))
 
 if __name__ == "__main__":
     main()
