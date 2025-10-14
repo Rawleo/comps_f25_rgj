@@ -18,6 +18,7 @@ dnazip/dbSNP/*.bb
 dnazip/files/*.txt
 dnazip/files/*.vcf
 dnazip/files/*.gz
+dnazip/*.txt
 
 alignment/files/*
 alignment/all2vcf*
