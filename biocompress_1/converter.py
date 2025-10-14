@@ -1,3 +1,5 @@
+from config import CONTENT
+
 def encodeFibonacci(num):
     fibNumbers = [1,2]
     while(fibNumbers[len(fibNumbers)-1]<=num):
@@ -17,6 +19,22 @@ def encodeFibonacci(num):
 
     return binaryCode
 
+def decodeFibonacci(num):
+    decoded = 0
+    num = num[:-1]
+    fibNumbers = [1,2]
+    while(len(fibNumbers)<len(num)):
+        fibNumbers.append(fibNumbers[-1]+fibNumbers[-2])
+    for i in range(len(num)):
+        if(num[i]=="1"):
+            decoded+=fibNumbers[i]
+    return decoded
+
+
+def encodeBinary(num):
+    return bin(num)[2:]
+    
+
 
 def baseToBinary(base: str):
     mapping = {
@@ -30,15 +48,28 @@ def baseToBinary(base: str):
 def encodeFactor(factor):
     length = factor[1]
     type = factor[2]
-    position = factor[0][0]
+    position = factor[0][0]+1
     if(type=="factor"):
         type="0"
     else:
         type="1"
+    posFib=encodeFibonacci(position)
+    # posBin=encodeBinary(position)
+    # if(len(posBin)<len(posFib)):
+    #     position = posBin+"B"
+    # else:
+    #     position = posFib+"F"
+    position = posFib #figure out binary later
     length=encodeFibonacci(length)
-    position=encodeFibonacci(position)
 
-    return length+type+position
+    if((factor[1]*2)<=len(length+type+position)):
+        string = CONTENT[factor[0][0]:factor[0][0]+factor[1]]
+        binary = ""
+        for base in string:
+            binary+=baseToBinary(base)
+        return binary
+    else:
+        return length+type+position
 
 
 
