@@ -24,11 +24,3 @@ def compares_dbsnp(variants_path, dbsnp_path, chr):
 
     # Return bit_array column as a single string
     return dbsnp_df.shape[0], ''.join(dbsnp_df['bit_array'].astype(str).tolist())
-
-def main():
-
-    variants_path = sys.argv[1]
-    dbsnp_path = sys.argv[2]
-    chr = sys.argv[3]
-
-    dbsnp_size, bit_map = compares_dbsnp(variants_path, dbsnp_path, chr)
