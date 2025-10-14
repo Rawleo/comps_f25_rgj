@@ -7,7 +7,8 @@
             encoding dictionary.
 '''
 
-import re, sys, argparse, os
+import re, sys, argparse, os, bitfile
+
 
 VARIATION_FLAG = {
     'snps': 0,
@@ -262,17 +263,21 @@ def encode_insertions(encoding_map, chr_insertion_dict):
     
     chr_bitstring_dict = {}
 
-    for chromosome, insertion_tuple in chr_insertion_dict.items():
+    for chromosome, insertion_tuple_array in chr_insertion_dict.items():
         
         insertion_chr = ""
 
-        for nucleotide_seq in insertion_tuple:
+        for insertion_tuple in insertion_tuple_array:
 
             # Need to work in VINT for position of each line
+            
+            flag, position, nucleotide_seq = insertion_tuple
+            
+            # bitfile.writeBitVINT(nucleotide_seq)
 
             insertion_line = ""
 
-            k_mer_array = re.findall(regex_k, nucleotide_seq[2])
+            k_mer_array = re.findall(regex_k, nucleotide_seq)
 
             for k_mer in k_mer_array:
 
@@ -280,9 +285,9 @@ def encode_insertions(encoding_map, chr_insertion_dict):
 
                 insertion_line += encoding
 
-            num_kmers = len(nucleotide_seq[2]) % k
+            num_kmers = len(nucleotide_seq) % k
 
-            extra_nuc = nucleotide_seq[2][:num_kmers]
+            extra_nuc = nucleotide_seq[:num_kmers]
 
             if (num_kmers != 0):
                 for char in extra_nuc:

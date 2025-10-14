@@ -81,4 +81,5 @@ def main():
     readBitVINT(byte_obj)
 
 
-main()
+if __name__ == "__main__":
+    main()
