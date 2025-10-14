@@ -53,43 +53,35 @@ def create_k_mer_array(input_text, k_mer_length):
     # FORMAT OF INPUT TEXT:
     # var_flag, chromosome, absolute_position, nucleotides
 
-    k = k_mer_length
-    regex_k = k * '.'
-    text_array = input_text.splitlines()
+    k             = k_mer_length
+    regex_k       = k * '.'
+    text_array    = input_text.splitlines()
+    chr_insertion = {}
     processed_k_mer_array = []
 
     for line in text_array:
 
-        # line_array = line.split(",")
         var_flag, chromosome, absolute_position, nucleotide_seq = line.split(",")
-        # var_flag = line_array[0]
         nucleotide_seq = nucleotide_seq.split("/")[1]
 
-        # chr_num = line_array[1]
-        # absolute_pos = line_array[2]
-
         if (int(var_flag) == VARIATION_FLAG['insertions']):
+            
+            insertion_row = (var_flag, absolute_position, nucleotide_seq)
+            
+            if (chromosome not in chr_insertion):
+                chr_insertion[chromosome] = [insertion_row]
+            else: 
+                chr_insertion[chromosome].append(insertion_row)
+            
             if (len(nucleotide_seq) >= k):
-
-                # Split the string by fours, discard excess
-                # Append the 4-mers into the insertion array
 
                 k_mer_array = re.findall(regex_k, nucleotide_seq)
 
                 for k_mer in k_mer_array:
+                    
                     processed_k_mer_array.append(k_mer)
 
-    # print("Number of k-mers:", len(processed_k_mer_array))
-
-    return processed_k_mer_array
-
-
-def process_k_mers(processed_k_mer_array):
-    # freq_dict = {}
-    # for k_mer in processed_k_mer_array:
-        
-
-    return None
+    return processed_k_mer_array, chr_insertion
 
 
 '''
@@ -256,13 +248,83 @@ def initialize_parser():
     
     args = parser.parse_args()
     
-    try:
-        with open(args.filename, "r") as file_in:
-            pass
-    except Exception as e:
-        print("Please choose a valid file in the files directory.")
-    
     return args
+
+
+def encode_insertions(encoding_map, chromosome_insertion_dictionary):
+    
+    NUC_ENCODING = {
+        "A" : "00",
+        "C" : "01",
+        "G" : "10",
+        "T" : "11",
+    }
+    
+    # insertion_line = ""
+    
+    # print(encoding_map)
+    
+    k = (len(next(iter(encoding_map)))) # k_mer_length
+    regex_k = k * '.'
+    
+    # discover size of k-mer
+    
+    for chromosome, insertion_tuple in chromosome_insertion_dictionary.items():
+        
+        # k_mer_array = re.findall(regex_k, )
+        
+        # insertion_tuple: variation_flag, absolute_position, insertion_seq
+        
+        # print(insertion_tuple)
+        
+        # divide each seq by k 
+        
+        # match each seq to a k-mer 
+        
+        # if less than 3, encode each char with 2 bit representation
+        
+        # position = nucleotide_seq[1]
+        
+        for nucleotide_seq in insertion_tuple:
+            
+            insertion_line = ""
+
+            k_mer_array = re.findall(regex_k, nucleotide_seq[2])
+            
+            for k_mer in k_mer_array:
+                
+                encoding = encoding_map[k_mer]
+                
+                insertion_line += encoding
+                
+                # print(encoding)
+            
+            # for the extra nucleotides 
+            
+            num_kmers = len(nucleotide_seq[2]) % k
+            
+            extra_nuc = nucleotide_seq[2][:num_kmers]
+            
+            # if (num_kmers != 0): print(num_kmers)
+            
+            if (num_kmers != 0): 
+                # print(extra_nuc)
+                for char in extra_nuc:
+                    encoding = NUC_ENCODING[char]
+                    
+                    insertion_line += encoding
+
+            print(nucleotide_seq, insertion_line)
+        
+
+        
+        
+    
+    
+    
+    
+    
+    return 
 
 
 '''
@@ -272,14 +334,19 @@ def main():
     args = initialize_parser()
     
     encoding_map = {}
-    text = read_in_file(f"files/{args.filename}") # In our paper, cite or create an appendix that discusses how we got to this. 
-    k_mer_array = create_k_mer_array(text, 4) # Cite insertion k-mer in DNAZip.
+    text = read_in_file(f"{args.filename}") # In our paper, cite or create an appendix that discusses how we got to this. 
+    k_mer_array, chromosome_insertion_dictionary = create_k_mer_array(text, 4) # Cite insertion k-mer in DNAZip.
     # print(k_mer_array)
     freq_dict = build_frequency_dict(k_mer_array) # Cite huffman paper, by Huffman himself. 
     # print(freq_dict)
     root = build_huffman_tree(freq_dict)
     map_encodings(root, encoding_map, "") # frequency table 4-mer, cite DNAZip paper and huffman table (paper). 
-    print(encoding_map)
+    encode_insertions(encoding_map, chromosome_insertion_dictionary)
+    
+    
+    
+    
+    
 
 if __name__ == "__main__":
     main()
