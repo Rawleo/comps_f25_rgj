@@ -15,6 +15,14 @@ VARIATION_FLAG = {
     'insertions': 2,
 }
 
+NUC_ENCODING = {
+    "A": "00",
+    "C": "01",
+    "G": "10",
+    "T": "11",
+}
+
+
 '''
 Node Class for implementing a binary tree.
 '''
@@ -53,32 +61,33 @@ def create_k_mer_array(input_text, k_mer_length):
     # FORMAT OF INPUT TEXT:
     # var_flag, chromosome, absolute_position, nucleotides
 
-    k             = k_mer_length
-    regex_k       = k * '.'
-    text_array    = input_text.splitlines()
+    k = k_mer_length
+    regex_k = k * '.'
+    text_array = input_text.splitlines()
     chr_insertion = {}
     processed_k_mer_array = []
 
     for line in text_array:
 
-        var_flag, chromosome, absolute_position, nucleotide_seq = line.split(",")
+        var_flag, chromosome, absolute_position, nucleotide_seq = line.split(
+            ",")
         nucleotide_seq = nucleotide_seq.split("/")[1]
 
         if (int(var_flag) == VARIATION_FLAG['insertions']):
-            
+
             insertion_row = (var_flag, absolute_position, nucleotide_seq)
-            
+
             if (chromosome not in chr_insertion):
                 chr_insertion[chromosome] = [insertion_row]
-            else: 
+            else:
                 chr_insertion[chromosome].append(insertion_row)
-            
+
             if (len(nucleotide_seq) >= k):
 
                 k_mer_array = re.findall(regex_k, nucleotide_seq)
 
                 for k_mer in k_mer_array:
-                    
+
                     processed_k_mer_array.append(k_mer)
 
     return processed_k_mer_array, chr_insertion
@@ -237,94 +246,62 @@ def export_as_txt(export_name, text):
 def initialize_parser():
     parser = argparse.ArgumentParser(
         prog="huffman",
-        description="Create Huffman encoding based on file input."
-    )
-    
-    parser.add_argument(
-        'filename',
-        type=str,
-        help="Input filename."
-    )
-    
+        description="Create Huffman encoding based on file input.")
+
+    parser.add_argument('filename', type=str, help="Input filename.")
+
     args = parser.parse_args()
-    
+
     return args
 
 
-def encode_insertions(encoding_map, chromosome_insertion_dictionary):
-    
-    NUC_ENCODING = {
-        "A" : "00",
-        "C" : "01",
-        "G" : "10",
-        "T" : "11",
-    }
-    
-    # insertion_line = ""
-    
-    # print(encoding_map)
-    
-    k = (len(next(iter(encoding_map)))) # k_mer_length
+def encode_insertions(encoding_map, chr_insertion_dict):
+
+    k = (len(next(iter(encoding_map))))  # k_mer_length
     regex_k = k * '.'
     
-    # discover size of k-mer
-    
-    for chromosome, insertion_tuple in chromosome_insertion_dictionary.items():
+    chr_bitstring_dict = {}
+
+    for chromosome, insertion_tuple in chr_insertion_dict.items():
         
-        # k_mer_array = re.findall(regex_k, )
-        
-        # insertion_tuple: variation_flag, absolute_position, insertion_seq
-        
-        # print(insertion_tuple)
-        
-        # divide each seq by k 
-        
-        # match each seq to a k-mer 
-        
-        # if less than 3, encode each char with 2 bit representation
-        
-        # position = nucleotide_seq[1]
-        
+        insertion_chr = ""
+
         for nucleotide_seq in insertion_tuple:
-            
+
+            # Need to work in VINT for position of each line
+
             insertion_line = ""
 
             k_mer_array = re.findall(regex_k, nucleotide_seq[2])
-            
+
             for k_mer in k_mer_array:
-                
+
                 encoding = encoding_map[k_mer]
-                
+
                 insertion_line += encoding
-                
-                # print(encoding)
-            
-            # for the extra nucleotides 
-            
+
             num_kmers = len(nucleotide_seq[2]) % k
-            
+
             extra_nuc = nucleotide_seq[2][:num_kmers]
-            
-            # if (num_kmers != 0): print(num_kmers)
-            
-            if (num_kmers != 0): 
-                # print(extra_nuc)
+
+            if (num_kmers != 0):
                 for char in extra_nuc:
                     encoding = NUC_ENCODING[char]
-                    
+
                     insertion_line += encoding
 
-            print(chromosome, nucleotide_seq, insertion_line)
-        
+            # print(chromosome, nucleotide_seq, insertion_line)
+            
+            insertion_chr += insertion_line
+            
+        chr_bitstring_dict[chromosome] = [insertion_chr]
 
-        
-        
-    
-    
-    
-    
-    
-    return 
+    return chr_bitstring_dict
+
+
+def print_dict(dict):
+    for key, item in dict.items():
+        print(f"'{key}': {item}")
 
 
 '''
@@ -332,21 +309,25 @@ Run the program.
 '''
 def main():
     args = initialize_parser()
-    
+
     encoding_map = {}
-    text = read_in_file(f"{args.filename}") # In our paper, cite or create an appendix that discusses how we got to this. 
-    k_mer_array, chromosome_insertion_dictionary = create_k_mer_array(text, 4) # Cite insertion k-mer in DNAZip.
+    text = read_in_file(
+        f"{args.filename}"
+    )  # In our paper, cite or create an appendix that discusses how we got to this.
+    k_mer_array, chr_insertion_dict = create_k_mer_array(
+        text, 4)  # Cite insertion k-mer in DNAZip.
     # print(k_mer_array)
-    freq_dict = build_frequency_dict(k_mer_array) # Cite huffman paper, by Huffman himself. 
+    freq_dict = build_frequency_dict(
+        k_mer_array)  # Cite huffman paper, by Huffman himself.
     # print(freq_dict)
     root = build_huffman_tree(freq_dict)
-    map_encodings(root, encoding_map, "") # frequency table 4-mer, cite DNAZip paper and huffman table (paper). 
-    encode_insertions(encoding_map, chromosome_insertion_dictionary)
-    
-    
-    
-    
-    
+    map_encodings(
+        root, encoding_map, ""
+    )  # frequency table 4-mer, cite DNAZip paper and huffman table (paper).
+    chr_bitstring_dict = encode_insertions(encoding_map, chr_insertion_dict)
+    print_dict(chr_bitstring_dict)
+
+
 
 if __name__ == "__main__":
     main()
