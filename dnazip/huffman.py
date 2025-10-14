@@ -273,9 +273,13 @@ def encode_insertions(encoding_map, chr_insertion_dict):
             
             flag, position, nucleotide_seq = insertion_tuple
             
-            # bitfile.writeBitVINT(nucleotide_seq)
+            position = int(position)
+            
+            pos_bitstring = bitfile.writeBitVINT(position)
+            
+            # print(chromosome, pos_bitstring, nucleotide_seq)
 
-            insertion_line = ""
+            insertion_line = pos_bitstring
 
             k_mer_array = re.findall(regex_k, nucleotide_seq)
 
@@ -329,8 +333,8 @@ def main():
     map_encodings(
         root, encoding_map, ""
     )  # frequency table 4-mer, cite DNAZip paper and huffman table (paper).
-    chr_bitstring_dict = encode_insertions(encoding_map, chr_insertion_dict)
-    print_dict(chr_bitstring_dict)
+    chr_bitstring_dict = encode_insertions(encoding_map, chr_insertion_dict) # This will contain the per chromosome insertions with the VINTs preceding the sequences. 
+    print_dict(chr_bitstring_dict) 
 
 
 
