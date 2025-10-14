@@ -7,13 +7,22 @@
             encoding dictionary.
 '''
 
-import re, sys, argparse, os
+import re, sys, argparse, os, bitfile
+
 
 VARIATION_FLAG = {
     'snps': 0,
     'deletions': 1,
     'insertions': 2,
 }
+
+NUC_ENCODING = {
+    "A": "00",
+    "C": "01",
+    "G": "10",
+    "T": "11",
+}
+
 
 '''
 Node Class for implementing a binary tree.
@@ -25,7 +34,18 @@ class Node:
         self.frequency = frequency
         self.leftChild = leftChild
         self.rightChild = rightChild
+        
 
+def initialize_parser():
+    parser = argparse.ArgumentParser(
+        prog="huffman",
+        description="Create Huffman encoding based on sorted variant file input.")
+
+    parser.add_argument('filename', type=str, help="Input filename.")
+
+    args = parser.parse_args()
+
+    return args
 
 '''
 Read in an input file.
@@ -38,7 +58,7 @@ def read_in_file(input_file):
     with open(input_file, "r") as file_in:
         text = (file_in.read())
     return text
-
+        
 
 '''
 Create a list of k-mers from insertion sequences.
@@ -56,40 +76,33 @@ def create_k_mer_array(input_text, k_mer_length):
     k = k_mer_length
     regex_k = k * '.'
     text_array = input_text.splitlines()
+    chr_insertion = {}
     processed_k_mer_array = []
 
     for line in text_array:
 
-        # line_array = line.split(",")
-        var_flag, chromosome, absolute_position, nucleotide_seq = line.split(",")
-        # var_flag = line_array[0]
+        var_flag, chromosome, absolute_position, nucleotide_seq = line.split(
+            ",")
         nucleotide_seq = nucleotide_seq.split("/")[1]
 
-        # chr_num = line_array[1]
-        # absolute_pos = line_array[2]
-
         if (int(var_flag) == VARIATION_FLAG['insertions']):
-            if (len(nucleotide_seq) >= k):
 
-                # Split the string by fours, discard excess
-                # Append the 4-mers into the insertion array
+            insertion_row = (var_flag, absolute_position, nucleotide_seq)
+
+            if (chromosome not in chr_insertion):
+                chr_insertion[chromosome] = [insertion_row]
+            else:
+                chr_insertion[chromosome].append(insertion_row)
+
+            if (len(nucleotide_seq) >= k):
 
                 k_mer_array = re.findall(regex_k, nucleotide_seq)
 
                 for k_mer in k_mer_array:
+
                     processed_k_mer_array.append(k_mer)
 
-    # print("Number of k-mers:", len(processed_k_mer_array))
-
-    return processed_k_mer_array
-
-
-def process_k_mers(processed_k_mer_array):
-    # freq_dict = {}
-    # for k_mer in processed_k_mer_array:
-        
-
-    return None
+    return processed_k_mer_array, chr_insertion
 
 
 '''
@@ -242,27 +255,73 @@ def export_as_txt(export_name, text):
         file.write(str(text))
 
 
-def initialize_parser():
-    parser = argparse.ArgumentParser(
-        prog="huffman",
-        description="Create Huffman encoding based on file input."
-    )
+# def initialize_parser():
+#     parser = argparse.ArgumentParser(
+#         prog="huffman",
+#         description="Create Huffman encoding based on file input.")
+
+#     parser.add_argument('filename', type=str, help="Input filename.")
+
+#     args = parser.parse_args()
+
+#     return args
+
+
+def encode_insertions(encoding_map, chr_insertion_dict):
+
+    k = (len(next(iter(encoding_map))))  # k_mer_length
+    regex_k = k * '.'
     
-    parser.add_argument(
-        'filename',
-        type=str,
-        help="Input filename."
-    )
-    
-    args = parser.parse_args()
-    
-    try:
-        with open(args.filename, "r") as file_in:
-            pass
-    except Exception as e:
-        print("Please choose a valid file in the files directory.")
-    
-    return args
+    chr_bitstring_dict = {}
+
+    for chromosome, insertion_tuple_array in chr_insertion_dict.items():
+        
+        insertion_chr = ""
+
+        for insertion_tuple in insertion_tuple_array:
+
+            # Need to work in VINT for position of each line
+            
+            flag, position, nucleotide_seq = insertion_tuple
+            
+            position = int(position)
+            
+            pos_bitstring = bitfile.writeBitVINT(position)
+            
+            # print(chromosome, pos_bitstring, nucleotide_seq)
+
+            insertion_line = pos_bitstring
+
+            k_mer_array = re.findall(regex_k, nucleotide_seq)
+
+            for k_mer in k_mer_array:
+
+                encoding = encoding_map[k_mer]
+
+                insertion_line += encoding
+
+            num_kmers = len(nucleotide_seq) % k
+
+            extra_nuc = nucleotide_seq[:num_kmers]
+
+            if (num_kmers != 0):
+                for char in extra_nuc:
+                    encoding = NUC_ENCODING[char]
+
+                    insertion_line += encoding
+
+            # print(chromosome, nucleotide_seq, insertion_line)
+            
+            insertion_chr += insertion_line
+            
+        chr_bitstring_dict[chromosome] = [insertion_chr]
+
+    return chr_bitstring_dict
+
+
+def print_dict(dict):
+    for key, item in dict.items():
+        print(f"'{key}': {item}")
 
 
 '''
@@ -270,16 +329,27 @@ Run the program.
 '''
 def main():
     args = initialize_parser()
-    
+
     encoding_map = {}
-    text = read_in_file(f"files/{args.filename}") # In our paper, cite or create an appendix that discusses how we got to this. 
-    k_mer_array = create_k_mer_array(text, 4) # Cite insertion k-mer in DNAZip.
+    text = read_in_file(
+        f"{args.filename}"
+    )  # In our paper, cite or create an appendix that discusses how we got to this.
+    k_mer_array, chr_insertion_dict = create_k_mer_array(
+        text, 4)  # Cite insertion k-mer in DNAZip.
     # print(k_mer_array)
-    freq_dict = build_frequency_dict(k_mer_array) # Cite huffman paper, by Huffman himself. 
+    freq_dict = build_frequency_dict(
+        k_mer_array)  # Cite huffman paper, by Huffman himself.
     # print(freq_dict)
     root = build_huffman_tree(freq_dict)
-    map_encodings(root, encoding_map, "") # frequency table 4-mer, cite DNAZip paper and huffman table (paper). 
-    print(encoding_map)
+    map_encodings(
+        root, encoding_map, ""
+    )  # frequency table 4-mer, cite DNAZip paper and huffman table (paper).
+    chr_bitstring_dict = encode_insertions(encoding_map, chr_insertion_dict) # This will contain the per chromosome insertions with the VINTs preceding the sequences. 
+    print_dict(chr_bitstring_dict) 
+    
+    return 0
+
+
 
 if __name__ == "__main__":
     main()
