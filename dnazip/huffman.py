@@ -314,7 +314,7 @@ def encode_insertions(encoding_map, chromosome_insertion_dictionary):
                     
                     insertion_line += encoding
 
-            print(nucleotide_seq, insertion_line)
+            print(chromosome, nucleotide_seq, insertion_line)
         
 
         
