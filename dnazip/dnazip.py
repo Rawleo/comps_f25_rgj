@@ -36,37 +36,51 @@ def encode_file(input_file_path, dbSNP_path):
 
     for chr in chr_list:
 
-        ascii_char = #FIGURE OUT THIS
+        # ascii_char = #FIGURE OUT THIS
 
-        bitmap_size, bitmap = compares_dbsnp(input_file_path, dbSNP_path, chr)
-        bitmap_size_VINT = writeBitVINT(bitmap_size)
-
-
+        bitmap_size, bitmap = dbSNP_bit_array.compares_dbsnp(input_file_path, dbSNP_path, chr)
+        bitmap_size_VINT = bitfile.writeBitVINT(bitmap_size)
 
 
 
 
-
-
-
-
-
-        
-
-
+def run_huffman(variation_file_text): 
     
-
+    encoding_map = {}
     
+    # In our paper, cite or create an appendix that discusses how we got to this.
+    k_mer_array, chr_insertion_dict = huffman.create_k_mer_array(
+        variation_file_text, 4)  # Cite insertion k-mer in DNAZip.
+    # print(k_mer_array)
+    freq_dict = huffman.build_frequency_dict(
+        k_mer_array)  # Cite huffman paper, by Huffman himself.
+    # print(freq_dict)
+    root = huffman.build_huffman_tree(freq_dict)
+    huffman.map_encodings(
+        root, encoding_map, ""
+    )  # frequency table 4-mer, cite DNAZip paper and huffman table (paper).
+    chr_insertion_bitstring_dict = huffman.encode_insertions(encoding_map, chr_insertion_dict) # This will contain the per chromosome insertions with the VINTs preceding the sequences. 
+    
+    return chr_insertion_bitstring_dict
+  
 
 
 
 def main(): 
     
-    args    = initialize_parser()
-    file_in = encode_file(args.filename)
+    args              = initialize_parser()
+    filepath          = args.filename
+    insertion_text    = huffman.read_in_file(filepath)
+    
+    dbSNP_path = "/Users/ryanson/Documents/Comps/comps_repo_venvs/comps_f25_rgj/dnazip/dbSNP"
+    
+    chr_insertion_bitstring_dict = run_huffman(insertion_text)
+    
+    # huffman.print_dict(chr_insertion_bitstring_dict)
+    
+    file_in = encode_file(filepath, dbSNP_path)    
     
     print(file_in)
-    
     
     
     
