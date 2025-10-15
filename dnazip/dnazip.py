@@ -36,7 +36,7 @@ def encode_file(input_file_path, dbSNP_path):
 
     for chr in chr_list:
 
-        # ascii_char = #FIGURE OUT THIS
+        ascii_char = str(ord("c")) + str(ord("h")) + str(ord("r")) + str(chr)
 
         bitmap_size, bitmap = dbSNP_bit_array.compares_dbsnp(input_file_path, dbSNP_path, chr)
         bitmap_size_VINT = bitfile.writeBitVINT(bitmap_size)
