@@ -1,6 +1,6 @@
 from AGCT_tree import createTree, findFactor
 from config import HEIGHT, DNA_FILE, CONTENT
-from converter import baseToBinary
+from converter import baseToBinary, encodeFactor, encodeFibonacci
 from typing import Optional
 
 
@@ -91,15 +91,18 @@ def process(i: int):
         return ("base", i, 0)
     
 def printBuf(buffer):
-    outputFile.write(str(len(buffer)))
+    outputFile.write(encodeFibonacci(len(buffer)))
+    # outputFile.write(" ")
+
     for i in buffer:
         if(i[0]=="base"):
-            outputFile.write(CONTENT[i[1]])
+            outputFile.write(baseToBinary(CONTENT[i[1]]))
         else:
-            outputFile.write(str(i[0]))
-            outputFile.write(str(i[1]))
-            outputFile.write(str(i[2]))
-    outputFile.write(" ")
+            # outputFile.write(str(i[0]))
+            # outputFile.write(str(i[1]))
+            # outputFile.write(str(i[2]))
+            outputFile.write(encodeFactor(i))
+        # outputFile.write(" ")
             
     
 def encode(processed, buffer):

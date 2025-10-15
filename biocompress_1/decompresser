@@ -1,0 +1,25 @@
+from config import HEIGHT, DNA_FILE
+from converter import decodeFibonacci
+
+open(DNA_FILE + "_dencoded.txt", "w").close()
+outputFile = open(DNA_FILE + "_dencoded.txt", "a", encoding="utf-8")
+with open(DNA_FILE + "_encoded.txt", "r") as file:
+       inputFile = file.read()
+
+def parseNum(i):
+    num = ""
+    while(num[-2:] != "11"):
+        num+=inputFile[i]
+        i+=1
+    return decodeFibonacci(num), len(num)
+
+def main():
+    type = "base"
+    i=0
+    while(i<len(inputFile)):
+        num, length = parseNum(i)
+        i+=length
+    outputFile.write(inputFile)
+
+if __name__ == "__main__":
+    main()
