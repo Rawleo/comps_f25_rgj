@@ -21,6 +21,9 @@ def compares_dbsnp(variants_path, dbsnp_path, chr):
     unmapped_snps_df = chr_df.where(chr_df['mapped'] == 0).dropna()
     unmapped_snps_df[[1, 2, 3]].to_csv(dbsnp_path + "unmapped_" + chr + ".csv", header=None, index=False)
 
+    bitmap_size = dbsnp_df.shape[0]
+    bitmap = ''.join(dbsnp_df['bit_array'].astype(str).tolist())
+    unmapped_count = unmapped_snps_df.shape[0]
 
     # Return bit_array column as a single string
-    return dbsnp_df.shape[0], ''.join(dbsnp_df['bit_array'].astype(str).tolist())
+    return bitmap_size, bitmap, unmapped_count 
