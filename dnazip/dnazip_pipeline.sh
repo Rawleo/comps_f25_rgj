@@ -40,8 +40,8 @@ usage() {
     echo "Commands:"
     echo "  --download-hg38                 Downloads hg38 genome files into '${CHR_DIR}/'."
     echo "  --prepare-dbsnp                 Prepares dbSNP files in '${DBSNP_DIR}/'."
-    echo "  --process-giab-trio             Automatically downloads and processes the GIAB HG002, HG003, and HG004 VCFs."
-    echo "  --process-vcf <in.vcf> <out.txt>  Manually processes a single VCF file from '${FILES_DIR}/'."
+    echo "  --download-giab-trio             Automatically downloads the GIAB HG002, HG003, and HG004 VCFs."
+    # echo "  --process-vcf <in.vcf> <out.txt>  Manually processes a single VCF file from '${FILES_DIR}/'."
     echo "  --all-prep                      Runs both --download-hg38 and --prepare-dbsnp."
     echo "  --guide                         Displays the full user and methods guide."
     echo "  --help, -h                      Show this help message."
@@ -275,7 +275,7 @@ download_giab_trio() {
     if [ "$all_files_present" = false ]; then
         exit 1
     fi
-    echo "--> All VCF files verified. Starting processing..."
+    echo "--> All VCF files verified."
     echo ""
 }
 
