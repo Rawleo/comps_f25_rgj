@@ -7,7 +7,7 @@
             encoding dictionary.
 '''
 
-import re, sys, argparse, os, bitfile
+import re, sys, argparse, os, vint as vint
 
 
 VARIATION_FLAG = {
@@ -286,7 +286,7 @@ def encode_insertions(encoding_map, chr_insertion_dict):
             
             position = int(position)
             
-            pos_bitstring = bitfile.writeBitVINT(position)
+            pos_bitstring = vint.writeBitVINT(position)
             
             # print(chromosome, pos_bitstring, nucleotide_seq)
 
