@@ -2,6 +2,11 @@
 .DS_Store
 ./venv
 
+dnazip/__pycache__/
+dnazip/files/*.bin
+dnazip/dbSNP/*.ipynb
+dnazip/dbSNP/*.csv
+
 # Ignore downloaded and generated files from the dnazip_pipeline.sh script
 # Ignore the directory containing downloaded chromosome FASTA files.
 # This prevents large, reproducible data from being committed to version control.
