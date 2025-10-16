@@ -37,7 +37,7 @@ def encode_file(input_file_path, dbSNP_path, k_mer_size):
         insr_df = chr_df.where(chr_df['var_type'] == 2).dropna()
         
         # Bitstring encoding of: chr#
-        ascii_chr_bitstring = ''.join(format(ord(x), 'b') for x in chr)
+        ascii_chr_bitstring = bitfile.encodeStringToBytes(chr)
         
         # Start of SNPs
         chr_encoding += ascii_chr_bitstring
@@ -99,6 +99,8 @@ def export_as_txt(export_name, text):
 
 
 def main(): 
+    
+    # hexdump -v -C files/HG003_GRCh38_Encoded.bin > files/HG003_GRCh38_Encoded_Hexdump.txt    
     
     k_mer_size = 4
     

@@ -42,6 +42,12 @@ def BytesToBitString(bytes_obj):
 
     return ''.join(format(byte, '08b') for byte in bytes_obj)
 
+def encodeStringToBytes(str):
+    
+    byte_representation = str.encode('utf-8')
+    
+    return "".join(format(byte, '08b') for byte in byte_representation)
+
 
 def readBitVINT(bytes_obj):
 
