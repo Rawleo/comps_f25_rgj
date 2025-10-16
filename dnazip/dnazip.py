@@ -42,7 +42,7 @@ def encode_file(input_file_path, dbSNP_path, chr_insertion_bitstring_dict):
         
         # print(dels_df)
 
-        ascii_char_bitstring = ' '.join(format(ord(x), 'b') for x in chr)
+        ascii_char_bitstring = ''.join(format(ord(x), 'b') for x in chr)
         
         chr_encoding += ascii_char_bitstring
 
@@ -61,7 +61,7 @@ def encode_file(input_file_path, dbSNP_path, chr_insertion_bitstring_dict):
         chr_encoding += ascii_char_bitstring
 
 
-        del_size, del_bitstring_pair = dels.encode_dels(dels_df)
+        del_size, pos_bitstring_vint, del_length_vint = dels.encode_dels(dels_df)
         # del_size_VINT = vint.writeBitVINT(del_size)
         # print(del_size_VINT)
 

@@ -13,8 +13,11 @@ def encode_dels(dels_df):
     
     ### merge the position and the variation info per line
     
-    dels_df["pos_var_vint"] = dels_df["pos"].astype(str) + dels_df["var_info"].astype(str)
+    # dels_df["pos_var_vint"] = dels_df["pos"].astype(str) + dels_df["var_info"].astype(str)
     # print(dels_df["pos_var_vint"])
+    
+    pos_bitstring_vint = ''.join(dels_df["pos"].astype(str).tolist())
+    del_length_vint = ''.join(dels_df["var_info"].astype(str).tolist())
     
     
     ### calc number of dels
@@ -24,6 +27,6 @@ def encode_dels(dels_df):
     ### return one whole concatenated line (pos_bitstring + del_bitstring) for the chromosome
     ### where the string is composed of pos_del_bitstring pairs. 
     
-    del_bitstring_pair = ''.join(dels_df["pos_var_vint"].astype(str).tolist())
+    # del_bitstring_pair = ''.join(dels_df["pos_var_vint"].astype(str).tolist())
     
-    return dels_size, del_bitstring_pair
+    return dels_size, pos_bitstring_vint, del_length_vint
