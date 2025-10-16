@@ -1,28 +1,35 @@
 from vint import *
 from huffman import *
 import pandas as pd
+from constants import *
 
-def encode_ins(insr_df, NUC_ENCODING):
+def encode_ins(insr_df, k_mer_size):
     
+    # Calculate size of insertions and convert to VINT
     insr_size_vint = writeBitVINT(insr_df.shape[0])
+    
+    # Convert positions to VINTs
     insr_df["pos"] = insr_df["pos"].astype(int).apply(writeBitVINT)
+    
+    # Split insertions into relevant nucleotides
     insr_df["var_info"] = insr_df["var_info"].apply(lambda x: x.split('/')[1])
+    
+    # Calculate length of each insertion sequence
     insr_df["var_length"] = insr_df["var_info"].apply(lambda x: len(x)).apply(writeBitVINT)
 
-    # print(insr_df["var_info"])
-    # print(insr_df["var_length"])
-
+    # Concatenate all insertion sequences for Huffman coding
     ins_seq = ''.join(insr_df["var_info"].astype(str).tolist())
     
-    # print(insertion_sequence)
-
+    # Concatenate all position VINTs
     pos_bitstr = ''.join(insr_df["pos"].astype(str).tolist())
+    
+    # Concatenate all position length VINTs
     len_bitstr = ''.join(insr_df["var_length"].astype(str).tolist())
 
     ### THEN RUN HUFFMAN ENCODING STUFF FOR THIS CHROMOSOME
+    encoding_len_vint, insr_seq_bitstring = run_huffman(ins_seq, k_mer_size)
     
-    encoding_len_vint, insr_seq_bitstring = run_huffman(ins_seq, NUC_ENCODING)
-    
+    # Placeholder
     ins_seq_bitstr = ""
     
     ### Huffman encoding will be for everything within the k-mers, then the extra nucleotides will then be encoded by their bit representations.

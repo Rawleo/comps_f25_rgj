@@ -8,14 +8,7 @@
 '''
 
 import re, sys, argparse, os, vint
-
-
-NUC_ENCODING = {
-    "A": "00",
-    "C": "01",
-    "G": "10",
-    "T": "11",
-}
+from constants import *
 
 
 '''
@@ -79,7 +72,7 @@ def create_k_mer_array(input_text, k_mer_length):
             ",")
         nucleotide_seq = nucleotide_seq.split("/")[1]
 
-        if (int(var_flag) == VARIATION_FLAG['insertions']):
+        if (int(var_flag) == VARIATION_FLAG['INSERTIONS']):
 
             insertion_row = (var_flag, absolute_position, nucleotide_seq)
 
@@ -314,7 +307,7 @@ def print_dict(dict):
         print(f"'{key}': {item}")
         
         
-def run_huffman(ins_seq, NUC_ENCODING):
+def run_huffman(ins_seq):
     
     encoding_len_vint = ''
     
@@ -322,6 +315,21 @@ def run_huffman(ins_seq, NUC_ENCODING):
     
     
     return encoding_len_vint, insr_seq_bitstring
+
+
+# def encode_insertions(variation_filepath): 
+    
+#     encoding_map                      = {}
+#     variation_file_text               = huffman.read_in_file(variation_filepath)
+#     k_mer_array, chr_insertion_dict   = huffman.create_k_mer_array(variation_file_text, 4)
+#     freq_dict                         = huffman.build_frequency_dict(k_mer_array)
+#     root                              = huffman.build_huffman_tree(freq_dict)
+    
+#     huffman.map_encodings(root, encoding_map, "")
+    
+#     chr_insertion_bitstring_dict      = huffman.encode_insertions(encoding_map, chr_insertion_dict)
+    
+#     return chr_insertion_bitstring_dict
 
 
 # '''
@@ -339,7 +347,6 @@ def run_huffman(ins_seq, NUC_ENCODING):
 #     chr_bitstring_dict                = encode_insertions(encoding_map, chr_insertion_dict) 
     
 #     return 0
-
 
 
 # if __name__ == "__main__":

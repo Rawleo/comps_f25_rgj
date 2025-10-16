@@ -2,21 +2,14 @@ import huffman, bitfile, dbsnp, dels, dbSNP_bit_array, snp, vint, dnazip, insr
 import argparse
 import pandas as pd
 import numpy as np
+from constants import *
 
-NUC_ENCODING = {
-    "A": "00",
-    "C": "01",
-    "G": "10",
-    "T": "11",
-}
+    
+INPUT_FILE_PATH = "/Users/ryanson/Documents/Comps/comps_repo_venvs/comps_f25_rgj/dnazip/files/HG003_GRCh38_sorted_variants.txt"
+DBSNP_PATH = "/Users/ryanson/Documents/Comps/comps_repo_venvs/comps_f25_rgj/dnazip/dbSNP/"
 
-VARIATION_FLAG = {
-    'SNPS': 0,
-    'DELETIONS': 1,
-    'INSERTIONS': 2,
-}
 
-def encode_file(input_file_path, dbSNP_path):
+def encode_file(input_file_path, dbSNP_path, k_mer_size):
     
     variants_df = pd.read_csv(input_file_path, 
                               names=['var_type', 'chr', 'pos', 'var_info'],
@@ -53,7 +46,7 @@ def encode_file(input_file_path, dbSNP_path):
         ### Add above to chr_encoding
 
         # Encoding of Unmapped SNPs
-        snp_size_vint, unmapped_pos_bitstr, unmapped_nuc_bitstr = snp.encode_SNPs(unmapped_df, NUC_ENCODING)
+        snp_size_vint, unmapped_pos_bitstr, unmapped_nuc_bitstr = snp.encode_SNPs(unmapped_df)
 
         #bit alignemnts?!
 
@@ -71,46 +64,17 @@ def encode_file(input_file_path, dbSNP_path):
         chr_encoding += ascii_chr_bitstring
         
         # Encoding of INSRs
-        ins_size_vint, ins_pos_bitstr, ins_len_bitstr, ins_seq_bitstr = insr.encode_ins(insr_df, NUC_ENCODING)
+        ins_size_vint, ins_pos_bitstr, ins_len_bitstr, ins_seq_bitstr = insr.encode_ins(insr_df, k_mer_size)
         
         ### Add above to chr_encoding
         
         #bit alignemnts?!        
 
 
-# def encode_insertions(variation_filepath): 
-    
-#     encoding_map                      = {}
-#     variation_file_text               = huffman.read_in_file(variation_filepath)
-#     k_mer_array, chr_insertion_dict   = huffman.create_k_mer_array(variation_file_text, 4)
-#     freq_dict                         = huffman.build_frequency_dict(k_mer_array)
-#     root                              = huffman.build_huffman_tree(freq_dict)
-    
-#     huffman.map_encodings(root, encoding_map, "")
-    
-#     chr_insertion_bitstring_dict      = huffman.encode_insertions(encoding_map, chr_insertion_dict)
-    
-#     return chr_insertion_bitstring_dict
-
-
 def main(): 
+    k_mer_size = 4
     
-    # args              = initialize_parser()
-    # filepath          = args.filepath
-    
-    INPUT_FILE_PATH = "/Users/ryanson/Documents/Comps/comps_repo_venvs/comps_f25_rgj/dnazip/files/HG003_GRCh38_sorted_variants.txt"
-    DBSNP_PATH = "/Users/ryanson/Documents/Comps/comps_repo_venvs/comps_f25_rgj/dnazip/dbSNP/"
-    
-    # chr_insertion_bitstring_dict = encode_insertions(INPUT_FILE_PATH)
-    
-    # huffman.print_dict(chr_insertion_bitstring_dict)
-    
-    encode_file(INPUT_FILE_PATH, DBSNP_PATH)    
-      
-    
-    return 0 
-
-
+    encode_file(INPUT_FILE_PATH, DBSNP_PATH, k_mer_size)
 
 if __name__ == "__main__":
     main()
