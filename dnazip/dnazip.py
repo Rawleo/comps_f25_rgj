@@ -39,6 +39,8 @@ def encode_file(input_file_path, dbSNP_path, chr_insertion_bitstring_dict):
 
         snps_df = chr_df.where(chr_df['var_type'] == 0).dropna()
         dels_df = chr_df.where(chr_df['var_type'] == 1).dropna()
+        
+        # print(dels_df)
 
         ascii_char_bitstring = ' '.join(format(ord(x), 'b') for x in chr)
         
@@ -59,9 +61,9 @@ def encode_file(input_file_path, dbSNP_path, chr_insertion_bitstring_dict):
         chr_encoding += ascii_char_bitstring
 
 
-        del_size, pos_bitstring, del_bitstring = dels.encode_dels(dels_df)
-        del_size_VINT = vint.writeBitVINT(del_size)
-        print(del_size_VINT)
+        del_size, del_bitstring_pair = dels.encode_dels(dels_df)
+        # del_size_VINT = vint.writeBitVINT(del_size)
+        # print(del_size_VINT)
 
         #bit alignemnts?!
         
