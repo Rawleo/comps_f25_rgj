@@ -7,14 +7,8 @@
             encoding dictionary.
 '''
 
-import re, sys, argparse, os, vint as vint
+import re, sys, argparse, os, vint
 
-
-VARIATION_FLAG = {
-    'snps': 0,
-    'deletions': 1,
-    'insertions': 2,
-}
 
 NUC_ENCODING = {
     "A": "00",
@@ -318,25 +312,35 @@ def encode_insertions(encoding_map, chr_insertion_dict):
 def print_dict(dict):
     for key, item in dict.items():
         print(f"'{key}': {item}")
-
-
-'''
-Run the program.
-'''
-def main():
-    args                              = initialize_parser()
-
-    encoding_map                      = {}
-    text                              = read_in_file(args.filename)
-    k_mer_array, chr_insertion_dict   = create_k_mer_array(text, 4)
-    freq_dict                         = build_frequency_dict(k_mer_array)
-    root                              = build_huffman_tree(freq_dict)
-    map_encodings(root, encoding_map, "")
-    chr_bitstring_dict                = encode_insertions(encoding_map, chr_insertion_dict) 
+        
+        
+def run_huffman(ins_seq, NUC_ENCODING):
     
-    return 0
+    encoding_len_vint = ''
+    
+    insr_seq_bitstring = ''
+    
+    
+    return encoding_len_vint, insr_seq_bitstring
+
+
+# '''
+# Run the program.
+# '''
+# def main():
+#     args                              = initialize_parser()
+
+#     encoding_map                      = {}
+#     text                              = read_in_file(args.filename)
+#     k_mer_array, chr_insertion_dict   = create_k_mer_array(text, 4)
+#     freq_dict                         = build_frequency_dict(k_mer_array)
+#     root                              = build_huffman_tree(freq_dict)
+#     map_encodings(root, encoding_map, "")
+#     chr_bitstring_dict                = encode_insertions(encoding_map, chr_insertion_dict) 
+    
+#     return 0
 
 
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()

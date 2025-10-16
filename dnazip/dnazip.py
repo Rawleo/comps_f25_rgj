@@ -10,6 +10,12 @@ NUC_ENCODING = {
     "T": "11",
 }
 
+VARIATION_FLAG = {
+    'SNPS': 0,
+    'DELETIONS': 1,
+    'INSERTIONS': 2,
+}
+
 def encode_file(input_file_path, dbSNP_path):
     
     variants_df = pd.read_csv(input_file_path, 
@@ -42,14 +48,12 @@ def encode_file(input_file_path, dbSNP_path):
         chr_encoding += ascii_chr_bitstring
 
         # Encoding of Mapped SNPs
-        bitmap, bitmap_size, unmapped_df = dbsnp.compares_dbsnp(snps_df, dbSNP_path, chr)
-        bitmap_size_VINT = vint.writeBitVINT(bitmap_size)
+        bitmap, bitmap_size_vint, unmapped_df = dbsnp.compares_dbsnp(snps_df, dbSNP_path, chr)
         
         ### Add above to chr_encoding
 
         # Encoding of Unmapped SNPs
-        snp_size, pos_bitstring, nuc_bitstring = snp.encode_SNPs(unmapped_df, NUC_ENCODING)
-        snp_size_VINT = vint.writeBitVINT(snp_size)
+        snp_size_vint, unmapped_pos_bitstr, unmapped_nuc_bitstr = snp.encode_SNPs(unmapped_df, NUC_ENCODING)
 
         #bit alignemnts?!
 
@@ -57,8 +61,7 @@ def encode_file(input_file_path, dbSNP_path):
         chr_encoding += ascii_chr_bitstring
 
         # Encoding of DELs
-        del_size, pos_bitstring_vint, del_length_vint = dels.encode_dels(dels_df)
-        del_size_VINT = vint.writeBitVINT(del_size)
+        del_size_vint, del_pos_bitstr, del_len_bitstr = dels.encode_dels(dels_df)
         
         ### Add above to chr_encoding
 
@@ -68,8 +71,7 @@ def encode_file(input_file_path, dbSNP_path):
         chr_encoding += ascii_chr_bitstring
         
         # Encoding of INSRs
-        ins_size, pos_bitstring_vint, ins_length_vint, insertion_sequence_bitstring = insr.encode_ins(insr_df)
-        ins_size_VINT = vint.writeBitVINT(ins_size)
+        ins_size_vint, ins_pos_bitstr, ins_len_bitstr, ins_seq_bitstr = insr.encode_ins(insr_df, NUC_ENCODING)
         
         ### Add above to chr_encoding
         

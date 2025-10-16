@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import sys
+from vint import *
 
 def compares_dbsnp(snps_df, dbsnp_path, chr):
 
@@ -16,8 +17,8 @@ def compares_dbsnp(snps_df, dbsnp_path, chr):
     snps_df.loc[map_mask, 'mapped'] = 1
     unmapped_snps_df = snps_df.where(snps_df['mapped'] == 0).dropna()[['chr', 'pos', 'var_info']]
 
-    bitmap_size = dbsnp_df.shape[0]
+    bitmap_size_vint = writeBitVINT(dbsnp_df.shape[0])
     bitmap = ''.join(dbsnp_df['bit_array'].astype(str).tolist())
 
     # Return bit_array column as a single string
-    return bitmap, bitmap_size, unmapped_snps_df
+    return bitmap, bitmap_size_vint, unmapped_snps_df
