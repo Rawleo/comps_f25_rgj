@@ -4,7 +4,7 @@
 
 dnazip/__pycache__/
 dnazip/files/*.bin
-dnazip/dbSNP/*.ipynb
+# dnazip/dbSNP/*.ipynb
 dnazip/dbSNP/*.csv
 
 # Ignore downloaded and generated files from the dnazip_pipeline.sh script
