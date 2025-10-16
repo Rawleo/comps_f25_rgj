@@ -254,7 +254,7 @@ def export_as_txt(export_name, text):
 #     return args
 
 
-def encode_insertions(encoding_map, chr_insertion_dict):
+def old_encode_insertions(encoding_map, chr_insertion_dict):
 
     k = (len(next(iter(encoding_map))))  # k_mer_length
     regex_k = k * '.'
@@ -307,14 +307,44 @@ def print_dict(dict):
         print(f"'{key}': {item}")
         
         
-def run_huffman(ins_seq):
+def insertions_to_kmers(ins_seq, k_mer_size):
     
-    encoding_len_vint = ''
+    k             = k_mer_size
+    regex_k       = k * '.'
+    k_mer_array   = re.findall(regex_k, ins_seq)
     
-    insr_seq_bitstring = ''
+    return k_mer_array  
+
+
+def encode_insertions(encoding_map, k_mer_array):
     
+    ins_bitstr    = ""
     
-    return encoding_len_vint, insr_seq_bitstring
+    for k_mer in k_mer_array:
+        
+        ins_bitstr += encoding_map[k_mer]
+        
+    return ins_bitstr
+        
+        
+def run_huffman(ins_seq, k_mer_size):
+    
+    # Testing if extra_nuc code worked
+    # ins_seq += "ATC"
+    
+    encoding_map    = {}
+    k               = k_mer_size
+    k_mer_array     = insertions_to_kmers(ins_seq, k)
+    ins_frq_dict    = build_frequency_dict(k_mer_array)
+    huffman_root    = build_huffman_tree(ins_frq_dict)
+    
+    map_encodings(huffman_root, encoding_map, "")
+    
+    extra_nuc_bitstr    = "".join(NUC_ENCODING[x] for x in ins_seq[:(len(ins_seq) % k)])
+    insr_seq_bitstr     = encode_insertions(encoding_map, k_mer_array)
+    insr_seq_bitstr     += extra_nuc_bitstr
+        
+    return insr_seq_bitstr
 
 
 # def encode_insertions(variation_filepath): 

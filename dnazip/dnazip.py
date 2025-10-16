@@ -64,7 +64,7 @@ def encode_file(input_file_path, dbSNP_path, k_mer_size):
         chr_encoding += ascii_chr_bitstring
         
         # Encoding of INSRs
-        ins_size_vint, ins_pos_bitstr, ins_len_bitstr, ins_seq_bitstr = insr.encode_ins(insr_df, k_mer_size)
+        ins_size_vint, ins_pos_bitstr, ins_len_bitstr, ins_bitstr_len_vint, ins_seq_bitstr = insr.encode_ins(insr_df, k_mer_size)
         
         ### Add above to chr_encoding
         

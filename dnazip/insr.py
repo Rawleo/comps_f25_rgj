@@ -27,14 +27,10 @@ def encode_ins(insr_df, k_mer_size):
     len_bitstr = ''.join(insr_df["var_length"].astype(str).tolist())
 
     ### THEN RUN HUFFMAN ENCODING STUFF FOR THIS CHROMOSOME
-    encoding_len_vint, insr_seq_bitstring = run_huffman(ins_seq, k_mer_size)
-    
-    # Placeholder
-    ins_seq_bitstr = ""
-    
-    ### Huffman encoding will be for everything within the k-mers, then the extra nucleotides will then be encoded by their bit representations.
-    
-    return insr_size_vint, pos_bitstr, len_bitstr, ins_seq_bitstr
+    ins_seq_bitstr  = run_huffman(ins_seq, k_mer_size)
+    bitstr_len_vint = writeBitVINT(len(ins_seq_bitstr))
+        
+    return insr_size_vint, pos_bitstr, len_bitstr, bitstr_len_vint, ins_seq_bitstr
 
 
 def main():
