@@ -1,86 +1,110 @@
-import huffman
-import bitfile
+import huffman, bitfile, dbsnp, dels, dbSNP_bit_array, snp, vint
 import argparse
-import dbSNP_bit_array
 import pandas as pd
 import numpy as np
 
-def initialize_parser():
-    parser = argparse.ArgumentParser(
-        prog="huffman",
-        description="Create Huffman encoding based on sorted variant file input.")
+NUC_ENCODING = {
+    "A": "00",
+    "C": "01",
+    "G": "10",
+    "T": "11",
+}
 
-    parser.add_argument('filename', type=str, help="Input filename.")
+# def initialize_parser():
+#     parser = argparse.ArgumentParser(
+#         prog="huffman",
+#         description="Create Huffman encoding based on sorted variant file input.")
 
-    args = parser.parse_args()
+#     parser.add_argument('filepath', type=str, help="Input filepath.")
 
-    return args
+#     args = parser.parse_args()
 
-'''
-Read in an input file.
-@params: 
- * input_file - text file to be read
-@return:
- * text - the contents of the file as a string
-'''
-def encode_file(input_file_path, dbSNP_path):
+#     return args
+
+
+def encode_file(input_file_path, dbSNP_path, chr_insertion_bitstring_dict):
     
     variants_df = pd.read_csv(input_file_path, 
                               names=['var_type', 'chr', 'pos', 'var_info'],
                               header=None)
-    
-    chr_list = variants_df['char'].unique()
 
-    del_count = variants_df.where(variants_df['var_type'] == 1).dropna().shape[0]
-    insert_count = variants_df.where(variants_df['var_type'] == 1).dropna().shape[0]
+    # chr_list = variants_df['char'].unique()
+    chr_list = ['chr1']
 
     for chr in chr_list:
+        
+        chr_encoding = ""
 
-        ascii_char = str(ord("c")) + str(ord("h")) + str(ord("r")) + str(chr)
+        chr_df = variants_df.where(variants_df['chr'] == chr)
 
-        bitmap_size, bitmap = dbSNP_bit_array.compares_dbsnp(input_file_path, dbSNP_path, chr)
-        bitmap_size_VINT = bitfile.writeBitVINT(bitmap_size)
+        snps_df = chr_df.where(chr_df['var_type'] == 0).dropna()
+        dels_df = chr_df.where(chr_df['var_type'] == 1).dropna()
+
+        ascii_char_bitstring = ' '.join(format(ord(x), 'b') for x in chr)
+        
+        chr_encoding += ascii_char_bitstring
+
+        bitmap, bitmap_size, unmapped_df = dbSNP_bit_array.compares_dbsnp(snps_df, dbSNP_path, chr)
+        bitmap_size_VINT = vint.writeBitVINT(bitmap_size)
+        # print(bitmap_size_VINT)
+
+
+        snp_size, pos_bitstring, nuc_bitstring = snp.encode_SNPs(unmapped_df, NUC_ENCODING)
+        snp_size_VINT = vint.writeBitVINT(snp_size)
+        # print(snp_size_VINT)
+
+
+        #bit alignemnts?!
+
+        chr_encoding += ascii_char_bitstring
+
+
+        del_size, pos_bitstring, del_bitstring = dels.encode_dels(dels_df)
+        del_size_VINT = vint.writeBitVINT(del_size)
+        print(del_size_VINT)
+
+        #bit alignemnts?!
+        
+        chr_encoding += ascii_char_bitstring
+
+        insertions = chr_insertion_bitstring_dict[chr]
+
+
+#LINE 2982 in HG002, need to clean vars
+        
 
 
 
-
-def run_huffman(variation_file_text): 
+def encode_insertions(variation_filepath): 
     
-    encoding_map = {}
+    encoding_map                      = {}
+    variation_file_text               = huffman.read_in_file(variation_filepath)
+    k_mer_array, chr_insertion_dict   = huffman.create_k_mer_array(variation_file_text, 4)
+    freq_dict                         = huffman.build_frequency_dict(k_mer_array)
+    root                              = huffman.build_huffman_tree(freq_dict)
     
-    # In our paper, cite or create an appendix that discusses how we got to this.
-    k_mer_array, chr_insertion_dict = huffman.create_k_mer_array(
-        variation_file_text, 4)  # Cite insertion k-mer in DNAZip.
-    # print(k_mer_array)
-    freq_dict = huffman.build_frequency_dict(
-        k_mer_array)  # Cite huffman paper, by Huffman himself.
-    # print(freq_dict)
-    root = huffman.build_huffman_tree(freq_dict)
-    huffman.map_encodings(
-        root, encoding_map, ""
-    )  # frequency table 4-mer, cite DNAZip paper and huffman table (paper).
-    chr_insertion_bitstring_dict = huffman.encode_insertions(encoding_map, chr_insertion_dict) # This will contain the per chromosome insertions with the VINTs preceding the sequences. 
+    huffman.map_encodings(root, encoding_map, "")
+    
+    chr_insertion_bitstring_dict      = huffman.encode_insertions(encoding_map, chr_insertion_dict)
     
     return chr_insertion_bitstring_dict
-  
-
 
 
 def main(): 
     
-    args              = initialize_parser()
-    filepath          = args.filename
-    insertion_text    = huffman.read_in_file(filepath)
+    # args              = initialize_parser()
+    # filepath          = args.filepath
     
-    dbSNP_path = "/Users/ryanson/Documents/Comps/comps_repo_venvs/comps_f25_rgj/dnazip/dbSNP"
+    INPUT_FILE_PATH = "/Users/ryanson/Documents/Comps/comps_repo_venvs/comps_f25_rgj/dnazip/files/HG003_GRCh38_sorted_variants.txt"
+    DBSNP_PATH = "/Users/ryanson/Documents/Comps/comps_repo_venvs/comps_f25_rgj/dnazip/dbSNP/"
     
-    chr_insertion_bitstring_dict = run_huffman(insertion_text)
+    chr_insertion_bitstring_dict = encode_insertions(INPUT_FILE_PATH)
     
     # huffman.print_dict(chr_insertion_bitstring_dict)
     
-    file_in = encode_file(filepath, dbSNP_path)    
+    encode_file(INPUT_FILE_PATH, DBSNP_PATH, chr_insertion_bitstring_dict)    
     
-    print(file_in)
+    # print(file_in)
     
     
     

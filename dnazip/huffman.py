@@ -277,20 +277,18 @@ def encode_insertions(encoding_map, chr_insertion_dict):
     for chromosome, insertion_tuple_array in chr_insertion_dict.items():
         
         insertion_chr = ""
-
+        
+        count_vint = vint.writeBitVINT(len(insertion_tuple_array))
+                
         for insertion_tuple in insertion_tuple_array:
-
-            # Need to work in VINT for position of each line
             
             flag, position, nucleotide_seq = insertion_tuple
             
             position = int(position)
             
-            pos_bitstring = vint.writeBitVINT(position)
+            pos_bitstring_vint = vint.writeBitVINT(position)
             
-            # print(chromosome, pos_bitstring, nucleotide_seq)
-
-            insertion_line = pos_bitstring
+            insertion_line = pos_bitstring_vint
 
             k_mer_array = re.findall(regex_k, nucleotide_seq)
 
@@ -309,8 +307,6 @@ def encode_insertions(encoding_map, chr_insertion_dict):
                     encoding = NUC_ENCODING[char]
 
                     insertion_line += encoding
-
-            # print(chromosome, nucleotide_seq, insertion_line)
             
             insertion_chr += insertion_line
             
@@ -328,24 +324,15 @@ def print_dict(dict):
 Run the program.
 '''
 def main():
-    args = initialize_parser()
+    args                              = initialize_parser()
 
-    encoding_map = {}
-    text = read_in_file(
-        f"{args.filename}"
-    )  # In our paper, cite or create an appendix that discusses how we got to this.
-    k_mer_array, chr_insertion_dict = create_k_mer_array(
-        text, 4)  # Cite insertion k-mer in DNAZip.
-    # print(k_mer_array)
-    freq_dict = build_frequency_dict(
-        k_mer_array)  # Cite huffman paper, by Huffman himself.
-    # print(freq_dict)
-    root = build_huffman_tree(freq_dict)
-    map_encodings(
-        root, encoding_map, ""
-    )  # frequency table 4-mer, cite DNAZip paper and huffman table (paper).
-    chr_bitstring_dict = encode_insertions(encoding_map, chr_insertion_dict) # This will contain the per chromosome insertions with the VINTs preceding the sequences. 
-    print_dict(chr_bitstring_dict) 
+    encoding_map                      = {}
+    text                              = read_in_file(args.filename)
+    k_mer_array, chr_insertion_dict   = create_k_mer_array(text, 4)
+    freq_dict                         = build_frequency_dict(k_mer_array)
+    root                              = build_huffman_tree(freq_dict)
+    map_encodings(root, encoding_map, "")
+    chr_bitstring_dict                = encode_insertions(encoding_map, chr_insertion_dict) 
     
     return 0
 
