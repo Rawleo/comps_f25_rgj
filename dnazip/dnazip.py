@@ -44,7 +44,7 @@ def encode_file(input_file_path, dbSNP_path, chr_insertion_bitstring_dict):
         
         chr_encoding += ascii_char_bitstring
 
-        bitmap, bitmap_size, unmapped_df = dbSNP_bit_array.compares_dbsnp(snps_df, dbSNP_path, chr)
+        bitmap, bitmap_size, unmapped_df = dbsnp.compares_dbsnp(snps_df, dbSNP_path, chr)
         bitmap_size_VINT = vint.writeBitVINT(bitmap_size)
         # print(bitmap_size_VINT)
 

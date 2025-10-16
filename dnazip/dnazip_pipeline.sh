@@ -223,51 +223,9 @@ prepare_dbsnp() {
     echo "--- dbSNP Data Preparation Complete ---"
 }
 
-# --- Task 3: Process VCF File ---
-process_vcf() {
-    local INPUT_BASENAME="$1"
-    local OUTPUT_BASENAME="$2"
-    mkdir -p "$FILES_DIR"
-    local INPUT_VCF="${FILES_DIR}/${INPUT_BASENAME}"
-    local OUTPUT_FILE="${FILES_DIR}/${OUTPUT_BASENAME}"
-
-    echo "--- Starting VCF Conversion for: $INPUT_VCF ---"
-    check_dependencies "bcftools" "awk" "sort"
-
-    if [ ! -f "$INPUT_VCF" ]; then
-        echo "Error: Input file '$INPUT_VCF' not found."
-        echo "Please ensure '$INPUT_BASENAME' is placed inside the '$FILES_DIR' directory."
-        exit 1
-    fi
-
-    bcftools query -f'%CHROM\t%POS\t%REF\t%ALT\n' "$INPUT_VCF" | \
-    awk 'BEGIN { OFS="," } {
-        chrom = $1; pos = $2; ref = $3;
-        n_alts = split($4, alts, ",");
-        for (j=1; j<=n_alts; j++) {
-            alt = alts[j];
-            rlen = length(ref);
-            alen = length(alt);
-            if (rlen == alen) {
-                flag = 0; alleles = ref "/" alt; print flag, chrom, pos, alleles;
-            } else if (rlen > alen) {
-                flag = 1; dashes = sprintf("%*s", rlen, ""); gsub(/ /, "-", dashes);
-                alleles = ref "/" dashes; print flag, chrom, pos, alleles;
-            } else {
-                flag = 2; inserted_seq = substr(alt, rlen + 1); ins_len = length(inserted_seq);
-                dashes = sprintf("%*s", ins_len, ""); gsub(/ /, "-", dashes);
-                alleles = dashes "/" inserted_seq; print flag, chrom, pos, alleles;
-            }
-        }
-    }' | sort -t, -k1,1n -k2,2V > "$OUTPUT_FILE"
-
-    echo "Conversion complete. Output saved to: $OUTPUT_FILE"
-    echo "--- VCF Processing Complete ---"
-}
-
 # --- Task 4: Automated GIAB Trio Processing ---
-process_giab_trio() {
-    echo "--- Starting Automated Download & Processing of GIAB Ashkenazim Trio ---"
+download_giab_trio() {
+    echo "--- Starting Automated Download of GIAB Ashkenazim Trio ---"
     check_dependencies "wget"
 
     # Use standard indexed arrays for bash v3 compatibility
@@ -319,23 +277,6 @@ process_giab_trio() {
     fi
     echo "--> All VCF files verified. Starting processing..."
     echo ""
-
-
-    # --- Step 3: Process each VCF file ---
-    for i in "${!SAMPLES[@]}"; do
-        local sample=${SAMPLES[$i]}
-        local vcf_url=${URLS[$i]}
-        local input_vcf_basename=$(basename "$vcf_url")
-        local output_txt_basename="${sample}_GRCh38_sorted_variants.txt"
-
-        echo "==========================================================="
-        echo "Processing Sample: ${sample}"
-        echo "==========================================================="
-
-        process_vcf "$input_vcf_basename" "$output_txt_basename"
-    done
-    echo ""
-    echo "--- GIAB Trio Processing Complete ---"
 }
 
 # --- Main Script Logic: Argument Parsing ---
@@ -359,8 +300,8 @@ case "$1" in
         fi
         process_vcf "$2" "$3"
         ;;
-    --process-giab-trio)
-        process_giab_trio
+    --download-giab-trio)
+        download
         ;;
     --all-prep)
         download_genome_references
