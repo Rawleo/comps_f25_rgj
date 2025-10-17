@@ -6,6 +6,8 @@ from typing import Optional
 
 open(DNA_FILE + "_encoded.txt", "w").close()
 outputFile = open(DNA_FILE + "_encoded.txt", "a", encoding="utf-8")
+open(DNA_FILE + "_encodedText.txt", "w").close()
+outputFileText = open(DNA_FILE + "_encodedText.txt", "a", encoding="utf-8")
 
 TREE = createTree(HEIGHT)
 
@@ -84,31 +86,43 @@ def process(i: int):
     print(longestFactor)
     TREE.createPositions(segment, i)
 
-
     if(longestFactor[0]):
+        longestFactor = encodeFactor(longestFactor)
+        print("longestFactor", longestFactor)
         return longestFactor
     else: 
-        return ("base", i, 0)
+        return (baseToBinary(CONTENT[i]), "base", 1)
     
 def printBuf(buffer):
-    outputFile.write(encodeFibonacci(len(buffer)))
-    # outputFile.write(" ")
+    outputFileText.write("L")
+    if(buffer[0][1]=="base"):
+        length=0
+        for item in buffer:
+            length+=item[2]
+        outputFile.write(encodeFibonacci(length))
+        outputFileText.write(encodeFibonacci(length))
+    else:
+        outputFile.write(encodeFibonacci(len(buffer)))
+        outputFileText.write(encodeFibonacci(len(buffer)))
 
-    for i in buffer:
-        if(i[0]=="base"):
-            outputFile.write(baseToBinary(CONTENT[i[1]]))
-        else:
-            # outputFile.write(str(i[0]))
-            # outputFile.write(str(i[1]))
-            # outputFile.write(str(i[2]))
-            outputFile.write(encodeFactor(i))
+    # outputFileText.write(str(len(buffer)))
+
+    # outputFile.write(" ")
+    outputFileText.write(" ")
+
+
+    for item in buffer:
+        outputFile.write(item[0])
+        outputFileText.write(item[0])
         # outputFile.write(" ")
+        outputFileText.write(" ")
+
             
     
 def encode(processed, buffer):
     if(len(buffer)==0):
         return [processed]
-    if((processed[0]=="base" and buffer[0][0]!= "base") or processed[0]!="base" and buffer[0][0]== "base"):
+    if((processed[1]=="base" and buffer[0][1]!= "base") or processed[1]!="base" and buffer[0][1]== "base"):
         printBuf(buffer)
         buffer=[]
     buffer.append(processed)
@@ -126,10 +140,7 @@ def main():
         print("buffer:", buffer)
 
 
-        if(processed[0]=="base"): #if factor
-            position += 1
-        else:
-            position+=processed[1]
+        position+=processed[2]
 
     printBuf(buffer)
 

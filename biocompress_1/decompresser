@@ -1,10 +1,10 @@
 from config import HEIGHT, DNA_FILE
-from converter import decodeFibonacci
+from converter import decodeFibonacci, binaryToBase
 
 open(DNA_FILE + "_dencoded.txt", "w").close()
 outputFile = open(DNA_FILE + "_dencoded.txt", "a", encoding="utf-8")
 with open(DNA_FILE + "_encoded.txt", "r") as file:
-       inputFile = file.read()
+    inputFile = file.read()
 
 def parseNum(i):
     num = ""
@@ -13,13 +13,56 @@ def parseNum(i):
         i+=1
     return decodeFibonacci(num), len(num)
 
+def parseBases(num, position):
+    bases=""
+    for i in range(num):
+        bases+=(binaryToBase(inputFile[position:position+2]))
+        position+=2
+    return bases
+
+def parseFactors(num, position):
+    factors = []
+    for i in range(num):
+        factorLength, length = parseNum(position)
+        position+=length
+        factorType = inputFile[position]
+        position+=1
+        factorPos, length = parseNum(position)
+        position+=length
+        factor = (factorLength, factorType, factorPos-1)
+        factors.append(factor)
+    return factors, position
+
+def decodeFactors(factors, outputDraft):
+    for factor in factors:
+        if(factor[1]=="0"):
+            for i in range(factor[0]):
+                outputDraft+=outputDraft[factor[2]+i]
+    return outputDraft
+
+
 def main():
-    type = "base"
+    outputDraft = ""
+    type = "bases"
     i=0
     while(i<len(inputFile)):
         num, length = parseNum(i)
         i+=length
-    outputFile.write(inputFile)
+
+        if (type == "bases"):
+            bases = parseBases(num, i)
+            i+=num*2
+            type="factors"
+            outputDraft+=bases
+
+        elif(type == "factors"):
+            factors, i = parseFactors(num, i)
+            print("factors:", factors)
+            outputDraft=decodeFactors(factors, outputDraft)
+            type= "bases"
+
+    
+    outputFile.write(outputDraft)
 
 if __name__ == "__main__":
     main()
