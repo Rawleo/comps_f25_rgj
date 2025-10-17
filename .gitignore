@@ -2,32 +2,15 @@
 .DS_Store
 ./venv
 
-dnazip/__pycache__/
-dnazip/files/*.bin
-# dnazip/dbSNP/*.ipynb
-dnazip/dbSNP/*.csv
-
-# Ignore downloaded and generated files from the dnazip_pipeline.sh script
-# Ignore the directory containing downloaded chromosome FASTA files.
-# This prevents large, reproducible data from being committed to version control.
-dnazip/chr/chr*
-
-# Ignore the directory containing downloaded and processed dbSNP data.
-dnazip/dbSNP/chr*
-dnazip/dbSNP/*.bb
-
-# Note: The 'files/' directory is intended for both input and output.
-# You should add your input VCF file (e.g., 'files/input.vcf.gz') to version control,
-# but you might want to ignore specific output files.
-# Example: Ignore all .txt files in the 'files' directory
-dnazip/files/*.txt
-dnazip/files/*.vcf
-dnazip/files/*.gz
-dnazip/*.txt
+dnazip/__pycache__/*
+dnazip/data/chr/chr*
+dnazip/data/dbSNP/*
+dnazip/data/original_paper_data/*
+dnazip/data/vcf/*
+dnazip/data/output*
 
 alignment/files/*
 alignment/all2vcf*
-
 alignment/*
 !alignment/*.sh
 !alignment/requirements.txt
