@@ -3,6 +3,7 @@
 ./venv
 
 dnazip/__pycache__/*
+dnazip/code/__pycache__/*
 dnazip/data/chr/chr*
 dnazip/data/dbSNP/*
 dnazip/data/original_paper_data/*

@@ -91,7 +91,7 @@ def export_as_binary(export_name, bitstr):
     
     byte_value = int(bitstr, 2).to_bytes((len(bitstr) + 7) // 8, byteorder='big')
     
-    with open(export_name + ".bin", "wb") as file:
+    with open(export_name + ".bin", "ab") as file:
         file.write(byte_value)
 
 
