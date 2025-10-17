@@ -42,6 +42,12 @@ def BytesToBitString(bytes_obj):
 
     return ''.join(format(byte, '08b') for byte in bytes_obj)
 
+def encodeStringToBytes(str):
+    
+    byte_representation = str.encode('utf-8')
+    
+    return "".join(format(byte, '08b') for byte in byte_representation)
+
 
 def readBitVINT(bytes_obj):
 
@@ -64,6 +70,29 @@ def readBitVINT(bytes_obj):
             break
 
     return num
+
+
+'''
+Export as binary file consisting of the encoded string transformed into bytes.
+The binary_string consists of a string of 1's and 0's, this string is then
+converted into an actual binary integer. From here, it is then converted into bytes.
+This transformation is accomplished by calculating the number of bytes required to 
+represent the given binary integer. Adding 7 to the length of the binary integer is
+done to round up to the nearest byte, so if a string is not entirely divisible by 8, 
+there will still be a byte representation of the bits that are left. This is then sorted
+in big-endian order.
+@params: 
+ * export_name - chosen filename 
+ * binary_str - the encoded huffman string
+@return:
+ * Exports a .bin file of the encoded string now as bytes to the current directory
+'''
+def export_as_binary(export_name, bitstr):
+    
+    byte_value = int(bitstr, 2).to_bytes((len(bitstr) + 7) // 8, byteorder='big')
+    
+    with open(export_name + ".bin", "wb") as file:
+        file.write(byte_value)
 
 
 def main():

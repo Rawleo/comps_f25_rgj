@@ -7,21 +7,8 @@
             encoding dictionary.
 '''
 
-import re, sys, argparse, os, bitfile
-
-
-VARIATION_FLAG = {
-    'snps': 0,
-    'deletions': 1,
-    'insertions': 2,
-}
-
-NUC_ENCODING = {
-    "A": "00",
-    "C": "01",
-    "G": "10",
-    "T": "11",
-}
+import re, sys, argparse, os, vint
+from constants import *
 
 
 '''
@@ -35,75 +22,6 @@ class Node:
         self.leftChild = leftChild
         self.rightChild = rightChild
         
-
-def initialize_parser():
-    parser = argparse.ArgumentParser(
-        prog="huffman",
-        description="Create Huffman encoding based on sorted variant file input.")
-
-    parser.add_argument('filename', type=str, help="Input filename.")
-
-    args = parser.parse_args()
-
-    return args
-
-'''
-Read in an input file.
-@params: 
- * input_file - text file to be read
-@return:
- * text - the contents of the file as a string
-'''
-def read_in_file(input_file):
-    with open(input_file, "r") as file_in:
-        text = (file_in.read())
-    return text
-        
-
-'''
-Create a list of k-mers from insertion sequences.
-@params: 
- * input_text - a string containing comma-separated variation data, one variation per line
- * k_mer_length - the integer length of the k-mer to be extracted from nucleotide sequences
-@return:
- * processed_k_mer_array - a list of k-mer strings extracted from all insertion sequences
-'''
-def create_k_mer_array(input_text, k_mer_length):
-
-    # FORMAT OF INPUT TEXT:
-    # var_flag, chromosome, absolute_position, nucleotides
-
-    k = k_mer_length
-    regex_k = k * '.'
-    text_array = input_text.splitlines()
-    chr_insertion = {}
-    processed_k_mer_array = []
-
-    for line in text_array:
-
-        var_flag, chromosome, absolute_position, nucleotide_seq = line.split(
-            ",")
-        nucleotide_seq = nucleotide_seq.split("/")[1]
-
-        if (int(var_flag) == VARIATION_FLAG['insertions']):
-
-            insertion_row = (var_flag, absolute_position, nucleotide_seq)
-
-            if (chromosome not in chr_insertion):
-                chr_insertion[chromosome] = [insertion_row]
-            else:
-                chr_insertion[chromosome].append(insertion_row)
-
-            if (len(nucleotide_seq) >= k):
-
-                k_mer_array = re.findall(regex_k, nucleotide_seq)
-
-                for k_mer in k_mer_array:
-
-                    processed_k_mer_array.append(k_mer)
-
-    return processed_k_mer_array, chr_insertion
-
 
 '''
 Build the required dictionary, mapping each symbol to their frequency.
@@ -164,95 +82,89 @@ def map_encodings(root, encoding_map, current):
     map_encodings(root.leftChild, encoding_map, current + "0")
     map_encodings(root.rightChild, encoding_map, current + "1")
 
-
-'''
-Encode the string according to its mapping.
-@params: 
- * encoding_map - a dictionary for each unique symbol corresponding to their unique encoding
- * text - input string to be encoded
-@return:
- * encoded_text - output text after it has been encoded by dict
-'''
-def encode_text(encoding_map, text):
-    encoded_text = ""
-    for char in text:
-        encoded_text += str(encoding_map[char])
-    return encoded_text
+        
+def insertions_to_kmers(ins_seq, k_mer_size):
+    
+    k             = k_mer_size
+    regex_k       = k * '.'
+    k_mer_array   = re.findall(regex_k, ins_seq)
+    
+    return k_mer_array  
 
 
-'''
-Decode the encoded string to retrieve the original string.
-@params: 
- * encoded_text - output text after it has been encoded by dict
- * root - the binary Huffman Tree beginning at the root.
-@return:
- * result - the original text after it has been decoded.
-'''
-def decode(encoded_text, root):
-    result = ""
-    curr = root
-    for char in encoded_text:
-        if char == "0":
-            curr = curr.leftChild
-        else:
-            curr = curr.rightChild
-        if curr.leftChild is None and curr.rightChild is None:
-            result += curr.symbol
-            curr = root
-    return result
+def encode_insertions(encoding_map, k_mer_array):
+    
+    ins_bitstr    = ""
+    
+    for k_mer in k_mer_array:
+        
+        ins_bitstr += encoding_map[k_mer]
+        
+    return ins_bitstr
+        
+        
+def run_huffman(ins_seq, k_mer_size):
+    
+    # Testing if extra_nuc code worked
+    # ins_seq += "ATC"
+    
+    encoding_map    = {}
+    k               = k_mer_size
+    k_mer_array     = insertions_to_kmers(ins_seq, k)
+    ins_frq_dict    = build_frequency_dict(k_mer_array)
+    huffman_root    = build_huffman_tree(ins_frq_dict)
+    
+    map_encodings(huffman_root, encoding_map, "")
+    
+    extra_nuc_bitstr    = "".join(NUC_ENCODING[x] for x in ins_seq[:(len(ins_seq) % k)])
+    insr_seq_bitstr     = encode_insertions(encoding_map, k_mer_array)
+    insr_seq_bitstr     += extra_nuc_bitstr
+        
+    return insr_seq_bitstr
 
+# '''
+# Create a list of k-mers from insertion sequences.
+# @params: 
+#  * input_text - a string containing comma-separated variation data, one variation per line
+#  * k_mer_length - the integer length of the k-mer to be extracted from nucleotide sequences
+# @return:
+#  * processed_k_mer_array - a list of k-mer strings extracted from all insertion sequences
+# '''
+# def create_k_mer_array(input_text, k_mer_length):
 
-'''
-Read in binary file from bytes to bits to string. For some reason it adds a leading zero....
-@params: 
- * filename - filename of .bin file
-@return:
- * bits - the original huffman encoded bits
-'''
-def read_bin(filename):
-    with open(filename + '.bin', 'rb') as file:
-        data = file.read()
-        # print(data)
-        bits = ''.join(format(byte, '08b') for byte in data)
-        # print(bits)
-    # Remove leading zero
-    return bits[1:]
+#     # FORMAT OF INPUT TEXT:
+#     # var_flag, chromosome, absolute_position, nucleotides
 
+#     k = k_mer_length
+#     regex_k = k * '.'
+#     text_array = input_text.splitlines()
+#     chr_insertion = {}
+#     processed_k_mer_array = []
 
-'''
-Export as binary file consisting of the encoded string transformed into bytes.
-The binary_string consists of a string of 1's and 0's, this string is then
-converted into an actual binary integer. From here, it is then converted into bytes.
-This transformation is accomplished by calculating the number of bytes required to 
-represent the given binary integer. Adding 7 to the length of the binary integer is
-done to round up to the nearest byte, so if a string is not entirely divisible by 8, 
-there will still be a byte representation of the bits that are left. This is then sorted
-in big-endian order.
-@params: 
- * export_name - chosen filename 
- * binary_str - the encoded huffman string
-@return:
- * Exports a .bin file of the encoded string now as bytes to the current directory
-'''
-def export_as_binary(export_name, binary_str):
-    byte_value = int(binary_str, 2).to_bytes((len(binary_str) + 7) // 8,
-                                             byteorder='big')
-    # print(byte_value)
-    with open(export_name + ".bin", "wb") as file:
-        file.write(byte_value)
+#     for line in text_array:
 
+#         var_flag, chromosome, absolute_position, nucleotide_seq = line.split(
+#             ",")
+#         nucleotide_seq = nucleotide_seq.split("/")[1]
 
-'''
-Export input text as txt file.
-@params: 
- * export_name - chosen filename 
- * text - input string to be exported
-@return:
- * Exports a text file to the current directory.
-'''
-def export_as_txt(export_name, text):
-    with open(export_name + ".txt", "w") as file:
-        file.write(str(text))
+#         if (int(var_flag) == VARIATION_FLAG['INSERTIONS']):
+
+#             insertion_row = (var_flag, absolute_position, nucleotide_seq)
+
+#             if (chromosome not in chr_insertion):
+#                 chr_insertion[chromosome] = [insertion_row]
+#             else:
+#                 chr_insertion[chromosome].append(insertion_row)
+
+#             if (len(nucleotide_seq) >= k):
+
+#                 k_mer_array = re.findall(regex_k, nucleotide_seq)
+
+#                 for k_mer in k_mer_array:
+
+#                     processed_k_mer_array.append(k_mer)
+
+#     return processed_k_mer_array, chr_insertion
 
 
 # def initialize_parser():
@@ -267,89 +179,109 @@ def export_as_txt(export_name, text):
 #     return args
 
 
-def encode_insertions(encoding_map, chr_insertion_dict):
+# def old_encode_insertions(encoding_map, chr_insertion_dict):
 
-    k = (len(next(iter(encoding_map))))  # k_mer_length
-    regex_k = k * '.'
+#     k = (len(next(iter(encoding_map))))  # k_mer_length
+#     regex_k = k * '.'
     
-    chr_bitstring_dict = {}
+#     chr_bitstring_dict = {}
 
-    for chromosome, insertion_tuple_array in chr_insertion_dict.items():
+#     for chromosome, insertion_tuple_array in chr_insertion_dict.items():
         
-        insertion_chr = ""
-
-        for insertion_tuple in insertion_tuple_array:
-
-            # Need to work in VINT for position of each line
+#         insertion_chr = ""
+        
+#         count_vint = vint.writeBitVINT(len(insertion_tuple_array))
+                
+#         for insertion_tuple in insertion_tuple_array:
             
-            flag, position, nucleotide_seq = insertion_tuple
+#             flag, position, nucleotide_seq = insertion_tuple
             
-            position = int(position)
+#             position = int(position)
             
-            pos_bitstring = bitfile.writeBitVINT(position)
+#             pos_bitstring_vint = vint.writeBitVINT(position)
             
-            # print(chromosome, pos_bitstring, nucleotide_seq)
+#             insertion_line = pos_bitstring_vint
 
-            insertion_line = pos_bitstring
+#             k_mer_array = re.findall(regex_k, nucleotide_seq)
 
-            k_mer_array = re.findall(regex_k, nucleotide_seq)
+#             for k_mer in k_mer_array:
 
-            for k_mer in k_mer_array:
+#                 encoding = encoding_map[k_mer]
 
-                encoding = encoding_map[k_mer]
+#                 insertion_line += encoding
 
-                insertion_line += encoding
+#             num_kmers = len(nucleotide_seq) % k
 
-            num_kmers = len(nucleotide_seq) % k
+#             extra_nuc = nucleotide_seq[:num_kmers]
 
-            extra_nuc = nucleotide_seq[:num_kmers]
+#             if (num_kmers != 0):
+#                 for char in extra_nuc:
+#                     encoding = NUC_ENCODING[char]
 
-            if (num_kmers != 0):
-                for char in extra_nuc:
-                    encoding = NUC_ENCODING[char]
-
-                    insertion_line += encoding
-
-            # print(chromosome, nucleotide_seq, insertion_line)
+#                     insertion_line += encoding
             
-            insertion_chr += insertion_line
+#             insertion_chr += insertion_line
             
-        chr_bitstring_dict[chromosome] = [insertion_chr]
+#         chr_bitstring_dict[chromosome] = [insertion_chr]
 
-    return chr_bitstring_dict
-
-
-def print_dict(dict):
-    for key, item in dict.items():
-        print(f"'{key}': {item}")
+#     return chr_bitstring_dict
 
 
-'''
-Run the program.
-'''
-def main():
-    args = initialize_parser()
-
-    encoding_map = {}
-    text = read_in_file(
-        f"{args.filename}"
-    )  # In our paper, cite or create an appendix that discusses how we got to this.
-    k_mer_array, chr_insertion_dict = create_k_mer_array(
-        text, 4)  # Cite insertion k-mer in DNAZip.
-    # print(k_mer_array)
-    freq_dict = build_frequency_dict(
-        k_mer_array)  # Cite huffman paper, by Huffman himself.
-    # print(freq_dict)
-    root = build_huffman_tree(freq_dict)
-    map_encodings(
-        root, encoding_map, ""
-    )  # frequency table 4-mer, cite DNAZip paper and huffman table (paper).
-    chr_bitstring_dict = encode_insertions(encoding_map, chr_insertion_dict) # This will contain the per chromosome insertions with the VINTs preceding the sequences. 
-    print_dict(chr_bitstring_dict) 
+# def encode_insertions(variation_filepath): 
     
-    return 0
+#     encoding_map                      = {}
+#     variation_file_text               = huffman.read_in_file(variation_filepath)
+#     k_mer_array, chr_insertion_dict   = huffman.create_k_mer_array(variation_file_text, 4)
+#     freq_dict                         = huffman.build_frequency_dict(k_mer_array)
+#     root                              = huffman.build_huffman_tree(freq_dict)
+    
+#     huffman.map_encodings(root, encoding_map, "")
+    
+#     chr_insertion_bitstring_dict      = huffman.encode_insertions(encoding_map, chr_insertion_dict)
+    
+#     return chr_insertion_bitstring_dict
 
 
+# def initialize_parser():
+#     parser = argparse.ArgumentParser(
+#         prog="huffman",
+#         description="Create Huffman encoding based on sorted variant file input.")
 
-if __name__ == "__main__":
-    main()
+#     parser.add_argument('filename', type=str, help="Input filename.")
+
+#     args = parser.parse_args()
+
+#     return args
+
+# '''
+# Read in an input file.
+# @params: 
+#  * input_file - text file to be read
+# @return:
+#  * text - the contents of the file as a string
+# '''
+# def read_in_file(input_file):
+#     with open(input_file, "r") as file_in:
+#         text = (file_in.read())
+#     return text
+
+
+# '''
+# Run the program.
+# '''
+# def main():
+#     args                              = initialize_parser()
+
+#     encoding_map                      = {}
+#     text                              = read_in_file(args.filename)
+#     k_mer_array, chr_insertion_dict   = create_k_mer_array(text, 4)
+#     freq_dict                         = build_frequency_dict(k_mer_array)
+#     root                              = build_huffman_tree(freq_dict)
+#     map_encodings(root, encoding_map, "")
+#     chr_bitstring_dict                = encode_insertions(encoding_map, chr_insertion_dict) 
+    
+#     return 0
+
+
+# if __name__ == "__main__":
+#     main()
