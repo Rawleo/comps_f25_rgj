@@ -28,13 +28,12 @@ def parseFactors(num, position):
         factorType = inputFile[position]
         position+=1
         factorPos, length = parseNum(position)
+        position+=length
         factor = (factorLength, factorType, factorPos-1)
         factors.append(factor)
-    print(position, inputFile[position:])
-    return factors
+    return factors, position
 
 def decodeFactors(factors, outputDraft):
-
     for factor in factors:
         if(factor[1]=="0"):
             for i in range(factor[0]):
@@ -46,33 +45,21 @@ def main():
     outputDraft = ""
     type = "bases"
     i=0
-    # while(i<len(inputFile)):
-    #     num, length = parseNum(i)
-    #     i+=length
-    #     if (type == "base"):
-    #          parseBase(num, i)
-    num, length = parseNum(i)
-    i+=length
-    if (type == "bases"):
-        bases = parseBases(num, i)
-        i+=num*2
-        type="factors"
-        outputDraft+=bases
-    
+    while(i<len(inputFile)):
+        num, length = parseNum(i)
+        i+=length
 
-    num, length = parseNum(i)
-    i+=length
-    print("outputDraft:", outputDraft)
-    print("i:", i)
+        if (type == "bases"):
+            bases = parseBases(num, i)
+            i+=num*2
+            type="factors"
+            outputDraft+=bases
 
-    if(type == "factors"):
-        factors = parseFactors(num, i)
-        print(factors)
-        outputDraft=decodeFactors(factors, outputDraft)
-        for factor in factors:
-            i+=factor[0]
-    
-   
+        elif(type == "factors"):
+            factors, i = parseFactors(num, i)
+            print("factors:", factors)
+            outputDraft=decodeFactors(factors, outputDraft)
+            type= "bases"
 
     
     outputFile.write(outputDraft)

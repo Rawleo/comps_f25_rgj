@@ -59,21 +59,24 @@ def encodeFactor(factor):
     type = factor[2]
     position = factor[0][0]+1
     if(type=="factor"):
-        type="0"
+        typeEncoded="0"
     else:
-        type="1"
+        typeEncoded="1"
     posFib=encodeFibonacci(position)
     position = posFib #figure out binary later
-    length=encodeFibonacci(length)
+    lengthEncoded=encodeFibonacci(length)
 
-    if((factor[1]*2)<=len(length+type+position)):
+    if((factor[1]*2)<=len(lengthEncoded+typeEncoded+position)):
         string = CONTENT[factor[0][0]:factor[0][0]+factor[1]]
         binary = ""
         for base in string:
             binary+=baseToBinary(base)
-        return binary
+        type = "base"
+        encoded = binary
     else:
-        return length+type+position
+        encoded = lengthEncoded+typeEncoded+position
+    return (encoded, type, length)
+
 
 def main():
     print(encodeFibonacci(3))
