@@ -45,6 +45,15 @@ def baseToBinary(base: str):
         }
     return mapping.get(base, "11")
 
+def binaryToBase(base):
+    mapping = {
+            "11": "A",
+            "10": "C",
+            "01": "T",
+            "00": "G",
+        }
+    return mapping.get(base, "A")
+
 def encodeFactor(factor):
     length = factor[1]
     type = factor[2]
@@ -54,11 +63,6 @@ def encodeFactor(factor):
     else:
         type="1"
     posFib=encodeFibonacci(position)
-    # posBin=encodeBinary(position)
-    # if(len(posBin)<len(posFib)):
-    #     position = posBin+"B"
-    # else:
-    #     position = posFib+"F"
     position = posFib #figure out binary later
     length=encodeFibonacci(length)
 
@@ -70,8 +74,6 @@ def encodeFactor(factor):
         return binary
     else:
         return length+type+position
-
-
 
 def main():
     print(encodeFibonacci(3))

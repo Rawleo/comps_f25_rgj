@@ -6,6 +6,8 @@ from typing import Optional
 
 open(DNA_FILE + "_encoded.txt", "w").close()
 outputFile = open(DNA_FILE + "_encoded.txt", "a", encoding="utf-8")
+open(DNA_FILE + "_encodedText.txt", "w").close()
+outputFileText = open(DNA_FILE + "_encodedText.txt", "a", encoding="utf-8")
 
 TREE = createTree(HEIGHT)
 
@@ -92,16 +94,21 @@ def process(i: int):
     
 def printBuf(buffer):
     outputFile.write(encodeFibonacci(len(buffer)))
+    outputFileText.write(str(len(buffer)))
     # outputFile.write(" ")
 
     for i in buffer:
         if(i[0]=="base"):
             outputFile.write(baseToBinary(CONTENT[i[1]]))
+            outputFileText.write(CONTENT[i[1]])
+
         else:
             # outputFile.write(str(i[0]))
             # outputFile.write(str(i[1]))
             # outputFile.write(str(i[2]))
             outputFile.write(encodeFactor(i))
+            outputFileText.write(encodeFactor)
+
         # outputFile.write(" ")
             
     
@@ -126,7 +133,7 @@ def main():
         print("buffer:", buffer)
 
 
-        if(processed[0]=="base"): #if factor
+        if(processed[0]=="base"):
             position += 1
         else:
             position+=processed[1]
