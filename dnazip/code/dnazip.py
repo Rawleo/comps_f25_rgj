@@ -5,9 +5,9 @@ import numpy as np
 from constants import *
 
     
-INPUT_FILE_PATH = "/Users/ryanson/Documents/Comps/comps_repo_venvs/comps_f25_rgj/dnazip/data/variants/HG002_GRCh38_sorted_variants.txt"
-DBSNP_PATH = "/Users/ryanson/Documents/Comps/comps_repo_venvs/comps_f25_rgj/dnazip/data/dbSNP/"
-OUTPUT_PATH = "/Users/ryanson/Documents/Comps/comps_repo_venvs/comps_f25_rgj/dnazip/data/output/HG002_GRCh38_Encoded"
+INPUT_FILE_PATH = "../data/variants/Small_HG002.txt"
+DBSNP_PATH = "../data/dbSNP/"
+OUTPUT_PATH = "../data/output/Small_HG002_GRCh38_Encoded"
 
 
 def encode_file(input_file_path, dbSNP_path, k_mer_size):
@@ -18,10 +18,10 @@ def encode_file(input_file_path, dbSNP_path, k_mer_size):
                                     header=None)
 
     # Create list of chromosomes to encode
-    # chr_list = variants_df['chr'].unique()
+    chr_list = variants_df['chr'].unique()
     
     # Testing one chromosome (smallest one by BPs)
-    chr_list = ['chr19']
+    # chr_list = ['chr1']
 
     for chr in chr_list:
         
@@ -152,7 +152,7 @@ def export_as_txt(export_name, text):
 
 def main(): 
     
-    # hexdump -v -C HG002_GRCh38_Encoded.bin > HG002_GRCh38_Encoded_Hexdump.txt    
+    # hexdump -v -C ../data/output/Small_HG002_GRCh38_Encoded.bin > ../data/output/Small_HG002_GRCh38_Hexdump.txt    
     
     k_mer_size = 4
     
