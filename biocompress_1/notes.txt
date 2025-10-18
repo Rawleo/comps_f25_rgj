@@ -1,6 +1,5 @@
 ToDo:
 binary or fibonacci
-factor or literal
 window
 palindrome position from i not from start
 
